@@ -51,7 +51,7 @@ Pipe CreateNewPipe()
 	newPipe.Diameter = GetCorrectNumber(0, 999999999);
 	return newPipe;
 }
-CS CreatNewCS()
+CS CreateNewCS()
 {
 	CS newCS;
 	cout << "\nСчитайте данные для компрессарных станций: " << endl;
@@ -70,7 +70,45 @@ CS CreatNewCS()
 	newCS.Efficiency = GetCorrectNumber(1, 10);
 	return newCS;
 }
+	
+void PrintPipe(Pipe p)
 
+{
+	cout << "\nИнтендификатор трубы id = " << p.id << endl;
+	cout << "Длинна трубы = " << p.Length << endl;
+	cout << "Диаметр трубы = " << p.Diameter << endl;
+	cout << (p.Repair ? "Труба в ремонте" : "Труба не в ремонте") << endl;
+}
+
+void PrintСS(CS c)
+{
+	cout << "\nИнтендификатор кс id = " << c.id << endl;
+	cout << "Имя трубы = " << c.Name << endl;
+	cout << "Количество цехов = " << c.Shop << endl;
+	cout << "Количество рабочих цехов = " << c.WorkShop << endl;
+}
+
+void FilePipe(Pipe p)
+{
+	ofstream fout;
+	fout.open("file.txt", ios::out);
+	if (fout.is_open())
+	{
+		fout << p.id  << endl << p.Length << endl << p.Diameter << endl << p.Repair << endl;
+		fout.close();
+	}
+}
+
+void FileCS(CS c)
+{
+	ofstream fout;
+	fout.open("file.txt", ios::app);
+	if (fout.is_open())
+	{
+		fout << c.id << endl << c.Name << endl << c.Shop  << endl << c.WorkShop << endl << c.Efficiency << endl;
+		fout.close();
+	}
+}
 
 
 
