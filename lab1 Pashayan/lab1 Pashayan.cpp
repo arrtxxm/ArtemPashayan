@@ -24,71 +24,72 @@ struct CS
 	int Efficiency = 0;
 };
 
-template <typename T>
-T GetCorrectNumber(T min, T max)
+template <typename V>
+V CheckValue(V min, V max)
 {
-	T x;
-	cout << "Введите значение от " << min << " до " << max << ":";
+	V x;
+	cout << "Значения в промежутке от " << min << " до " << max << ":";
 	cin >> x;
 	while (cin.fail() || x<min || x>max)
 	{
 		cin.clear();
 		cin.ignore(1000000, '\n');
-		cout << "Введите значение от " << min << " до " << max << ":";
+		cout << "Ошибка:Введите значение от " << min << " до " << max << ":";
 		cin >> x;
 	}
 	return x;
 }
+
 Pipe CreateNewPipe()
 {
 	Pipe newPipe;
-	cout << "Введите характеристики трубы:" << endl;
+	cout << "Характеристики трубы:" << endl;
 	newPipe.id = 0;
 	newPipe.Repair = false;
-	cout << "Введите длину трубы в метрах" << endl;
-	newPipe.Length = GetCorrectNumber(0.0, 10000000.0);
-	cout << "Введите диаметр трубы в миллиметрах (мм) " << endl;
-	newPipe.Diameter = GetCorrectNumber(0, 999999999);
+	cout << "Введите длину трубы в метрах:" << endl;
+	newPipe.Length = CheckValue(0.0, 10000000.0);
+	cout << "Введите диаметр трубы в миллиметрах: " << endl;
+	newPipe.Diameter = CheckValue(0, 10000000);
 	return newPipe;
 }
+
 CS CreateNewCS()
 {
 	CS newCS;
-	cout << "\nСчитайте данные для компрессарных станций: " << endl;
+	cout << "\nХарактеристики компрессорной станции:" << endl;
 	newCS.id = 1;
-	cout << "Введите имя компрессорной станции: ";
+	cout << "Введите имя компрессорной станции:";
 	cin.get();
 	getline(cin, newCS.Name);
-	cout << "Введите количество цехов " << endl;
-	newCS.Shop = GetCorrectNumber(0, 999999999);
+	cout << "Введите количество цехов:" << endl;
+	newCS.Shop = CheckValue(0, 10000000);
 	do
 	{
-		cout << "Введите количество цехов в работе " << endl;
-		newCS.WorkShop = GetCorrectNumber(0, 999999999);
-	} while (newCS.Shop < newCS.WorkShop); // проверка количество рбочих заводов между общим количеством заводов
-	cout << "Введите эффективность трубы (1-10) " << endl;
-	newCS.Efficiency = GetCorrectNumber(1, 10);
+		cout << "Введите количество цехов в работе:" << endl;
+		newCS.WorkShop = CheckValue(0, 10000000);
+	} while (newCS.Shop < newCS.WorkShop);
+	cout << "Введите эффективность трубы (от 1 до 10):" << endl;
+	newCS.Efficiency = CheckValue(1, 10);
 	return newCS;
 }
 	
-void PrintPipe(Pipe p)
-
+void ShowPipe(Pipe p)
 {
-	cout << "\nИнтендификатор трубы id = " << p.id << endl;
-	cout << "Длинна трубы = " << p.Length << endl;
+	cout << "\nИдентификатор трубы id = " << p.id << endl;
+	cout << "Длина трубы = " << p.Length << endl;
 	cout << "Диаметр трубы = " << p.Diameter << endl;
 	cout << (p.Repair ? "Труба в ремонте" : "Труба не в ремонте") << endl;
 }
 
-void PrintСS(CS c)
+void ShowСS(CS c)
 {
-	cout << "\nИнтендификатор кс id = " << c.id << endl;
-	cout << "Имя трубы = " << c.Name << endl;
+	cout << "\nИнтендификатор компрессорной станции (id) = " << c.id << endl;
+	cout << "Название компрессорной станции= " << c.Name << endl;
 	cout << "Количество цехов = " << c.Shop << endl;
 	cout << "Количество рабочих цехов = " << c.WorkShop << endl;
 }
 
-void FilePipe(Pipe p)
+void toFilePipe(Pipe p)
 {
 	ofstream fout;
 	fout.open("file.txt", ios::out);
@@ -99,7 +100,7 @@ void FilePipe(Pipe p)
 	}
 }
 
-void FileCS(CS c)
+void toFileCS(CS c)
 {
 	ofstream fout;
 	fout.open("file.txt", ios::app);
@@ -110,14 +111,166 @@ void FileCS(CS c)
 	}
 }
 
-
-
-	int main()
+Pipe fromFilePipe(ifstream& fin)
 {
 	Pipe p;
-	CS c;
+	fin >> p.id; 
+	fin >> p.Length;
+	fin >> p.Diameter;
+	fin >> p.Repair;
+	return p;
 }
 
+CS fromFileCS(ifstream& fin)
+{
+	CS c;
+	fin >> c.id;
+	fin >> c.Name;
+	fin >> c.Shop;
+	fin >> c.WorkShop;
+	fin >> c.Efficiency;
+	return c;
+}
+
+void Menu()
+{
+	cout << "1. Создать трубу" << endl;
+	cout << "2. Создать компрессорную станцию" << endl;
+	cout << "3. Просмотреть все объекты" << endl;
+	cout << "4. Изменить статус ремонта трубы" << endl;
+	cout << "5. Запуск/остановка цеха" << endl;
+	cout << "6. Сохранить данные в файл" << endl;
+	cout << "7. Считать данные из файла" << endl;
+	cout << "8. Выход" << endl;
+}
+
+void ChangeStatus(bool& status)
+{
+	status = !status;
+}
+
+void StopWork(CS& c) 
+{
+	c.WorkShop--;
+}
+
+void StartWork(CS& c) 
+{
+	c.WorkShop++;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	Pipe p;
+	CS c;
+	bool inPipe = false;
+	bool inCS = false;
+	while (true)
+	{
+		Menu();
+		int i = CheckValue(1, 8);
+		switch (i)
+		{
+		case 1:
+		{
+			p = CreateNewPipe();
+			break;
+		}
+		case 2:
+		{
+			c = CreateNewCS();
+			break;
+			
+		}
+		case 3:
+		{
+			ShowPipe(p);
+			ShowСS(c);
+			break;
+		}
+		case 4:
+		{
+			ChangeStatus(p.Repair);
+			break;
+		}
+
+		case 5:
+		{
+			cout << "\t Выберите действие:" << endl;
+			cout << "\t 1. Запуск цеха" << endl;
+			cout << "\t 2. Остановка цеха" << endl;
+			switch (CheckValue(1, 2))
+			{
+			case 1:
+				if (c.WorkShop < c.Shop)
+				{
+					StartWork(c);
+				}
+				else
+				{
+					cout << "Все цеха в работе" << endl;
+				}
+				break;
+			case 2:
+				if (c.WorkShop > 0)
+				{
+					StopWork(c);
+				}
+				else
+				{
+					cout << "Нет рабочих цехов" << endl;
+				}
+				break;
+			default:
+				cout << "Ошибка" << endl;
+				break;
+			}
+		}
+		case 6:
+		{
+			toFilePipe(p);
+			toFileCS(c);
+			inPipe = !inPipe;
+			inCS = !inCS;
+			break;
+		}
+		case 7:
+		{
+			ifstream fin;
+			fin.open("file.txt", ios::in);
+			if (fin.is_open())
+			{
+				if (inPipe == true)
+				{
+					p = fromFilePipe(fin);
+				}
+				else
+				{
+					cout << "Труба не создана" << endl;
+				}
+				if (inCS == true)
+				{
+					c = fromFileCS(fin);
+				}
+				else
+				{
+					cout << "Kомпрессорная станция не создана" << endl;
+				}
+			}
+			break;
+		}
+		case 8:
+		{
+			return 0;
+			break;
+		default:
+			cout << "Ошибка" << endl;
+			break;
+		}
+		}
+	}
+}
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
 // Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
 
