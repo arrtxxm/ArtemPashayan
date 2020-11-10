@@ -1,11 +1,33 @@
 ﻿// lab1 Pashayan.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
-#include <iostream>
+#include < iostream >
+#include < string >
+#include < fstream >
+using namespace std;
+
+
+struct PIPE
+{
+	int id = 1;
+	double Length = 0.0;
+	int Diameter = 0;
+	bool Repair = false;
+	};
+
+struct CS
+{
+	int id = 1;
+	string name = "";
+	int shop = 0;
+	int shopwork = 0;
+	int efficiency = 0;
+};
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	PIPE p;
+	CS c;
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
