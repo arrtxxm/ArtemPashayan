@@ -28,12 +28,12 @@ template <typename V>
 V CheckValue(V min, V max)
 {
 	V x;
-	cout << "Значения в промежутке от " << min << " до " << max << ":";
+	cout << "Выберите от " << min << " до " << max << ":";
 	cin >> x;
 	while (cin.fail() || x<min || x>max)
 	{
 		cin.clear();
-		cin.ignore(1000000, '\n');
+		cin.ignore(10000000, '\n');
 		cout << "Ошибка:Введите значение от " << min << " до " << max << ":";
 		cin >> x;
 	}
@@ -44,7 +44,7 @@ Pipe CreateNewPipe()
 {
 	Pipe newPipe;
 	cout << "Характеристики трубы:" << endl;
-	newPipe.id = 0;
+	newPipe.id = 1;
 	newPipe.Repair = false;
 	cout << "Введите длину трубы в метрах:" << endl;
 	newPipe.Length = CheckValue(0.0, 10000000.0);
@@ -73,7 +73,7 @@ CS CreateNewCS()
 	return newCS;
 }
 	
-void ShowPipe(Pipe p)
+void ShowPipe(const Pipe& p)
 {
 	cout << "\nИдентификатор трубы id = " << p.id << endl;
 	cout << "Длина трубы = " << p.Length << endl;
@@ -81,15 +81,16 @@ void ShowPipe(Pipe p)
 	cout << (p.Repair ? "Труба в ремонте" : "Труба не в ремонте") << endl;
 }
 
-void ShowСS(CS c)
+void ShowСS(const CS& c)
 {
 	cout << "\nИнтендификатор компрессорной станции (id) = " << c.id << endl;
 	cout << "Название компрессорной станции= " << c.Name << endl;
 	cout << "Количество цехов = " << c.Shop << endl;
 	cout << "Количество рабочих цехов = " << c.WorkShop << endl;
+	cout << "Продуктивность = " << c.Efficiency << endl;
 }
 
-void toFilePipe(Pipe p)
+void toFilePipe(const Pipe& p)
 {
 	ofstream fout;
 	fout.open("file.txt", ios::out);
@@ -100,7 +101,7 @@ void toFilePipe(Pipe p)
 	}
 }
 
-void toFileCS(CS c)
+void toFileCS(const CS& c)
 {
 	ofstream fout;
 	fout.open("file.txt", ios::app);
@@ -141,7 +142,8 @@ void Menu()
 	cout << "5. Запуск/остановка цеха" << endl;
 	cout << "6. Сохранить данные в файл" << endl;
 	cout << "7. Считать данные из файла" << endl;
-	cout << "8. Выход" << endl;
+	cout << "8. Очистить консоль" << endl;
+	cout << "9. Выход" << endl;
 }
 
 void ChangeStatus(bool& status)
@@ -151,12 +153,28 @@ void ChangeStatus(bool& status)
 
 void StopWork(CS& c) 
 {
-	c.WorkShop--;
+	if (c.WorkShop > 0)
+		{
+		c.WorkShop--;
+		}
+	else
+		{
+		cout << "Нет рабочих цехов" << endl;
+		}
 }
 
 void StartWork(CS& c) 
 {
-	c.WorkShop++;
+
+
+	if (c.WorkShop < c.Shop)
+		{
+			c.WorkShop++;
+		}
+	else
+		{
+			cout << "Все цеха в работе" << endl;
+		}	
 }
 
 int main()
@@ -164,12 +182,10 @@ int main()
 	setlocale(LC_ALL, "Russian");
 	Pipe p;
 	CS c;
-	bool inPipe = false;
-	bool inCS = false;
 	while (true)
 	{
 		Menu();
-		int i = CheckValue(1, 8);
+		int i = CheckValue(1, 9);
 		switch (i)
 		{
 		case 1:
@@ -181,7 +197,7 @@ int main()
 		{
 			c = CreateNewCS();
 			break;
-			
+
 		}
 		case 3:
 		{
@@ -194,7 +210,6 @@ int main()
 			ChangeStatus(p.Repair);
 			break;
 		}
-
 		case 5:
 		{
 			cout << "\t Выберите действие:" << endl;
@@ -202,28 +217,16 @@ int main()
 			cout << "\t 2. Остановка цеха" << endl;
 			switch (CheckValue(1, 2))
 			{
-			case 1:
-				if (c.WorkShop < c.Shop)
+				case 1:
 				{
 					StartWork(c);
 				}
-				else
-				{
-					cout << "Все цеха в работе" << endl;
-				}
 				break;
-			case 2:
-				if (c.WorkShop > 0)
+				case 2:
+
 				{
 					StopWork(c);
 				}
-				else
-				{
-					cout << "Нет рабочих цехов" << endl;
-				}
-				break;
-			default:
-				cout << "Ошибка" << endl;
 				break;
 			}
 		}
@@ -231,8 +234,6 @@ int main()
 		{
 			toFilePipe(p);
 			toFileCS(c);
-			inPipe = !inPipe;
-			inCS = !inCS;
 			break;
 		}
 		case 7:
@@ -241,31 +242,21 @@ int main()
 			fin.open("file.txt", ios::in);
 			if (fin.is_open())
 			{
-				if (inPipe == true)
-				{
-					p = fromFilePipe(fin);
-				}
-				else
-				{
-					cout << "Труба не создана" << endl;
-				}
-				if (inCS == true)
-				{
-					c = fromFileCS(fin);
-				}
-				else
-				{
-					cout << "Kомпрессорная станция не создана" << endl;
-				}
+				p = fromFilePipe(fin);
+				c = fromFileCS(fin);
 			}
+			else cout << "Ошибка:файла не существует" << endl;
+			fin.close();
 			break;
 		}
 		case 8:
 		{
-			return 0;
+			system("cls");
 			break;
-		default:
-			cout << "Ошибка" << endl;
+		}
+		case 9: 
+		{
+			return 0;
 			break;
 		}
 		}
