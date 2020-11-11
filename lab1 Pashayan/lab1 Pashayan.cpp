@@ -73,7 +73,7 @@ CS CreateNewCS()
 	return newCS;
 }
 	
-void ShowPipe(const Pipe& p)
+void ShowPipe(const Pipe& p)//передача по ссылке, исправил
 {
 	cout << "\nИдентификатор трубы id = " << p.id << endl;
 	cout << "Длина трубы = " << p.Length << endl;
@@ -151,7 +151,7 @@ void ChangeStatus(bool& status)
 	status = !status;
 }
 
-void StopWork(CS& c) 
+void StopWork(CS& c) //условие перенес из case
 {
 	if (c.WorkShop > 0)
 		{
