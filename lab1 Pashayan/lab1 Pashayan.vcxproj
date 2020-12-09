@@ -24,6 +24,7 @@
     <ProjectGuid>{719e3732-8c25-4a8b-81bd-493ae7e81bc2}</ProjectGuid>
     <RootNamespace>lab1Pashayan</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>lab2 Pashayan</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -139,7 +140,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CS.cpp" />
     <ClCompile Include="lab1 Pashayan.cpp" />
+    <ClCompile Include="Pipe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CS.h" />
+    <ClInclude Include="Pipe.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

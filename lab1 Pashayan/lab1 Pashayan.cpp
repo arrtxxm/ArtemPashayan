@@ -1,267 +1,401 @@
 ﻿// lab1 Pashayan.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
-#include < iostream >
-#include < string >
-#include < fstream >
+#include <math.h>
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include "Pipe.h"
+#include "CS.h"
+
+#include "utils.h"
+
 using namespace std;
 
-	
-struct Pipe
-{
-	int id = 1;
-	double Length = 0.0;
-	int Diameter = 0;
-	bool Repair = false;
-	};
+void Print_second_menu(string clause1, string clause2);
 
-struct CS
-{
-	int id = 1;
-	string Name = "";
-	int Shop = 0;
-	int WorkShop = 0;
-	int Efficiency = 0;
-};
+template<class T, typename T_param>
+using Filter = bool(*)(const T& obj, T_param param);
 
-template <typename V>
-V CheckValue(V min, V max)
-{
-	V x;
-	cout << "Выберите от " << min << " до " << max << ":";
-	cin >> x;
-	while (cin.fail() || x<min || x>max)
-	{
-		cin.clear();
-		cin.ignore(10000000, '\n');
-		cout << "Ошибка:Введите значение от " << min << " до " << max << ":";
-		cin >> x;
+template<class T, typename T_param>
+vector<int> FindObjectsByFilter(const unordered_map<int, T>& m, Filter<T, T_param> f, T_param param) {
+	vector <int> res;
+	for (auto& obj : m) {
+		if (f(obj.second, param))
+			res.push_back(obj.first);
 	}
-	return x;
+	return res;
 }
 
-Pipe CreateNewPipe()
-{
-	Pipe newPipe;
-	cout << "Характеристики трубы:" << endl;
-	newPipe.id = 1;
-	newPipe.Repair = false;
-	cout << "Введите длину трубы в метрах:" << endl;
-	newPipe.Length = CheckValue(0.0, 10000000.0);
-	cout << "Введите диаметр трубы в миллиметрах: " << endl;
-	newPipe.Diameter = CheckValue(0, 10000000);
-	return newPipe;
+template <class T>
+bool CheckByID(const T& p, unsigned int param) {
+	return p.getid() == param;
 }
 
-CS CreateNewCS()
-{
-	CS newCS;
-	cout << "\nХарактеристики компрессорной станции:" << endl;
-	newCS.id = 1;
-	cout << "Введите имя компрессорной станции:";
-	cin.get();
-	getline(cin, newCS.Name);
-	cout << "Введите количество цехов:" << endl;
-	newCS.Shop = CheckValue(0, 10000000);
-	do
-	{
-		cout << "Введите количество цехов в работе:" << endl;
-		newCS.WorkShop = CheckValue(0, 10000000);
-	} while (newCS.Shop < newCS.WorkShop);
-	cout << "Введите эффективность трубы (от 1 до 10):" << endl;
-	newCS.Efficiency = CheckValue(1, 10);
-	return newCS;
-}
-	
-void ShowPipe(const Pipe& p)//передача по ссылке, исправил
-{
-	cout << "\nИдентификатор трубы id = " << p.id << endl;
-	cout << "Длина трубы = " << p.Length << endl;
-	cout << "Диаметр трубы = " << p.Diameter << endl;
-	cout << (p.Repair ? "Труба в ремонте" : "Труба не в ремонте") << endl;
+bool CheckByBroken(const Pipe& p, bool param) {
+	return p.getbroken() == param;
 }
 
-void ShowСS(const CS& c)
-{
-	cout << "\nИнтендификатор компрессорной станции (id) = " << c.id << endl;
-	cout << "Название компрессорной станции= " << c.Name << endl;
-	cout << "Количество цехов = " << c.Shop << endl;
-	cout << "Количество рабочих цехов = " << c.WorkShop << endl;
-	cout << "Продуктивность = " << c.Efficiency << endl;
+bool CheckByName(const CS& cs, string param) {
+	return cs.getname() == param;
 }
 
-void toFilePipe(const Pipe& p)
+bool CheckByPercentOfWorkshops(const CS& cs, double param) {
+	double percentage_workshops = 1.0 - cs.getrunning_workshops() / (double)cs.getworkshops();
+	return (abs(percentage_workshops - param / 100.0) < 0.0001);
+}
+
+
+
+//T& SelectPipeCS(vector <T>& v) {
+//	while (true) {
+//		unsigned int id = CheckValue("Введите ID: ", 0, 10000);
+//		int n = 0;
+//		for (auto& obj : v) {
+//			if (obj.getid() == id) {
+//				return v[n];
+//			}
+//			n++;
+//		}
+//	}
+//}
+
+template<class T>
+void DeletePipeCS(unordered_map <int, T>& m) 
 {
-	ofstream fout;
-	fout.open("file.txt", ios::out);
-	if (fout.is_open())
-	{
-		fout << p.id  << endl << p.Length << endl << p.Diameter << endl << p.Repair << endl;
-		fout.close();
+	unsigned int id = CheckValue("Введите ID: ", 0, 10000);
+	int n = 0;
+	bool is_finded = false;
+	if (m.count(id) == 1) m.erase(id);
+	else cout << "Такого ID не существует" << endl;
+}
+
+
+void EditingPipes(unordered_map<int, Pipe>& m, vector<int> EditedPipes) 
+{
+
+	int answer;
+	while (true) {
+		Print_second_menu("All found", "Slice");
+		answer = CheckValue("Your choice (0-2): ", 0, 2);
+		if (answer == 1) {
+			for (auto& i : EditedPipes) {
+				m[i].Pipe_status_change();
+			}
+			break;
+		}
+		else if (answer == 2) {
+			int begin_slice = CheckValue("Type start index the slice: ", 0, Pipe::getMaxID());
+			int end_slice = CheckValue("Type end index of the slice: ", begin_slice, Pipe::getMaxID());
+			int n = 0;
+			for (auto& p : m) {
+				if (p.second.getid() >= begin_slice && p.second.getid() <= end_slice) {
+					p.second.Pipe_status_change();
+				}
+				n++;
+			}
+		}
+		else 
+		{
+			break;
+		}
 	}
 }
 
-void toFileCS(const CS& c)
+
+
+
+
+void PrintMenu()
 {
-	ofstream fout;
-	fout.open("file.txt", ios::app);
-	if (fout.is_open())
-	{
-		fout << c.id << endl << c.Name << endl << c.Shop  << endl << c.WorkShop << endl << c.Efficiency << endl;
-		fout.close();
-	}
+	cout << "-------------------\n"
+		<< "1. Создание трубы или КС" << "\n"
+		<< "2. Вывод всех объектов" << "\n"
+		<< "3. Редактирование трубы или КС" << "\n"
+		<< "4. Удаление трубы или КС" << "\n"
+		<< "5. Поиск труб по заданному фильтру" << "\n"
+		<< "6. Поиск КС по заданному фильтру" << "\n"
+		<< "7. Пакетное редактирование труб" << "\n"
+		<< "8. Сохранение в файл" << "\n"
+		<< "9. Загрузка из файла" << "\n"
+		<< "10. Очистить консоль" << "\n"
+		<< "0. Выход" << "\n"
+		<< "-------------------" << endl;
 }
 
-Pipe fromFilePipe(ifstream& fin)
+void Print_second_menu(string clause1, string clause2)
 {
-	Pipe p;
-	fin >> p.id; 
-	fin >> p.Length;
-	fin >> p.Diameter;
-	fin >> p.Repair;
-	return p;
+	cout << "-------------------\n"
+		<< "0. Назад" << "\n"
+		<< "1. " << clause1 << "\n"
+		<< "2. " << clause2 << "\n"
+		<< "-------------------" << endl;
 }
 
-CS fromFileCS(ifstream& fin)
-{
-	CS c;
-	fin >> c.id;
-	fin >> c.Name;
-	fin >> c.Shop;
-	fin >> c.WorkShop;
-	fin >> c.Efficiency;
-	return c;
-}
-
-void Menu()
-{
-	cout << "1. Создать трубу" << endl;
-	cout << "2. Создать компрессорную станцию" << endl;
-	cout << "3. Просмотреть все объекты" << endl;
-	cout << "4. Изменить статус ремонта трубы" << endl;
-	cout << "5. Запуск/остановка цеха" << endl;
-	cout << "6. Сохранить данные в файл" << endl;
-	cout << "7. Считать данные из файла" << endl;
-	cout << "8. Очистить консоль" << endl;
-	cout << "9. Выход" << endl;
-}
-
-void ChangeStatus(bool& status)
-{
-	status = !status;
-}
-
-void StopWork(CS& c) //условие перенес из case
-{
-	if (c.WorkShop > 0)
-		{
-		c.WorkShop--;
-		}
-	else
-		{
-		cout << "Нет рабочих цехов" << endl;
-		}
-}
-
-void StartWork(CS& c) 
-{
-
-
-	if (c.WorkShop < c.Shop)
-		{
-			c.WorkShop++;
-		}
-	else
-		{
-			cout << "Все цеха в работе" << endl;
-		}	
-}
 
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	Pipe p;
-	CS c;
+	unordered_map <int, Pipe> Pipes;
+	unordered_map <int, CS> CSs;
+	vector <int> EditedPipes;
 	while (true)
 	{
-		Menu();
-		int i = CheckValue(1, 9);
-		switch (i)
+		PrintMenu();
+		int choice = CheckValue("Выберите от 0 до 10: ", 0, 10);
+		cout << '\n';
+		switch (choice)
 		{
 		case 1:
 		{
-			p = CreateNewPipe();
+			while (true)
+			{
+				Print_second_menu("Труба", "КС");
+				int choice1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (choice1 == 1) 
+				{
+					Pipe pipe;
+					cin >> pipe;
+					Pipes.emplace(pipe.getid(), pipe);
+				}
+				else if (choice1 == 2) 
+				{
+					CS cs;
+					cin >> cs;
+					CSs.emplace(cs.getid(), cs);
+				}
+				else if (choice1 == 0) 
+				{
+					break;
+				}
+				else 
+				{
+					cout << "Ошибка: выберите от 0 до 2" << endl;
+				}
+			}
 			break;
 		}
 		case 2:
 		{
-			c = CreateNewCS();
-			break;
-
-		}
-		case 3:
-		{
-			ShowPipe(p);
-			ShowСS(c);
-			break;
-		}
-		case 4:
-		{
-			ChangeStatus(p.Repair);
-			break;
-		}
-		case 5:
-		{
-			cout << "\t Выберите действие:" << endl;
-			cout << "\t 1. Запуск цеха" << endl;
-			cout << "\t 2. Остановка цеха" << endl;
-			switch (CheckValue(1, 2))
-			{
-				case 1:
+			if (Pipes.size() != 0) {
+				for (auto& p : Pipes) 
 				{
-					StartWork(c);
+					cout << p.second << endl;
 				}
-				break;
-				case 2:
-
-				{
-					StopWork(c);
-				}
-				break;
 			}
-		}
-		case 6:
-		{
-			toFilePipe(p);
-			toFileCS(c);
+			else {
+				cout << "Вы еще не создавали трубы" << endl;
+			}
+			if (CSs.size() != 0) {
+				for (auto& cs : CSs) {
+					cout << cs.second << endl;
+				}
+			}
+			else {
+				cout << "Вы еще не создавали КС" << endl;
+			}
 			break;
 		}
-		case 7:
+		case 3: {
+			while (true) {
+				Print_second_menu("Труба", "КС");
+				int choice3 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (choice3 == 1) {
+					int ID = CheckValue("Введите ID:", 1u, Pipes.size());
+					if (Pipes.size() != 0) {
+						if (Pipes.count(ID))
+							Pipes[ID].Pipe_status_change();
+						else cout << " Такого ID не существует " << endl;
+					}
+					else {
+						cout << "Вы еще не создавали трубы" << endl;
+					}
+				}
+				else if (choice3 == 2) {
+					int ID = CheckValue("Введите ID:", 1u, CSs.size());
+					if (CSs.size() != 0) {
+						CSs[ID].edit_CS();
+					}
+					else {
+						cout << "Вы еще не создавали КС" << endl;
+					}
+				}
+				else if (choice3 == 0) {
+					cout << '\n';
+					break;
+				}
+				else {
+					cout << "Ошибка, выберите от 0 до 2" << endl;
+				}
+			}
+			break;
+		}
+		case 4: {
+			while (true) {
+				Print_second_menu("Труба", "КС");
+				int choice1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (choice1 == 1) {
+					if (Pipes.size() != 0) {
+						DeletePipeCS(Pipes);
+					}
+					else {
+						cout << "Вы еще не создавали трубы" << endl;
+					}
+				}
+				else if (choice1 == 2) {
+					if (CSs.size() != 0) {
+						DeletePipeCS(CSs);
+					}
+					else {
+						cout << "Вы еще не создавали КС" << endl;
+					}
+				}
+				else if (choice1 == 0) {
+					cout << '\n';
+					break;
+				}
+				else {
+					cout << "Ошибка: выберите от 0 до 2" << endl;
+				}
+			}
+			break;
+		}
+		case 5: {
+			while (true) {
+				Print_second_menu("Поиск по ID", "Поиск по статусу в ремонте ");
+				int choice5 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (choice5 == 1) {
+					unsigned int id_to_find;
+					id_to_find = CheckValue("Введите ID: ", 0u, 10000u);
+					for (int i : FindObjectsByFilter(Pipes, CheckByID, id_to_find)) {
+						cout << Pipes[i] << endl;
+						EditedPipes.push_back(i);
+					}
+				}
+				else if (choice5 == 2) {
+					bool is_broken_status_to_find;
+					is_broken_status_to_find = CheckValue("В ремонте? [да-1/нет-0]: ", false, true);
+					for (int i : FindObjectsByFilter(Pipes, CheckByBroken, is_broken_status_to_find)) {
+						cout << Pipes[i] << endl;
+						EditedPipes.push_back(i);
+					}
+				}
+				else if (choice5 == 0) {
+					break;
+				}
+				else {
+					cout << "Ошибка: выберите от 0 до 2" << endl;
+				}
+			}
+			break;
+		}
+		case 6: 
 		{
+			while (true) 
+			{
+				Print_second_menu("Поиск по имени", "Поиск по проценту незадействованных цехов");
+				int choice6 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (choice6 == 1) {
+					string name_to_find;
+					cout << "Введите имя КС: ";
+					cin.get();
+					getline(cin, name_to_find);
+					for (int i : FindObjectsByFilter(CSs, CheckByName, name_to_find)) {
+						cout << CSs[i] << endl;
+					}
+				}
+				else if (choice6 == 2) {
+					double percentage_to_find;
+					percentage_to_find = CheckValue("Введите значение в процентах (0-100%): ", 0.0, 100.0);
+					for (int i : FindObjectsByFilter(CSs, CheckByPercentOfWorkshops, percentage_to_find)) {
+						cout << CSs[i] << endl;
+					}
+				}
+				else if (choice6 == 0) {
+					break;
+				}
+				else {
+					cout << "Ошибка: выберите от 0 до 2 " << endl;
+				}
+			}
+			break;
+		}
+		case 7: {
+			if (Pipes.size() != 0) {
+				EditingPipes(Pipes, EditedPipes);
+			}
+			else {
+				cout << "Вы еще не создавали трубы" << endl;
+			}
+			break;
+		}
+		case 8: {
+			ofstream fout;
+			string filename;
+			cout << "Введите название файла: ";
+			cin.ignore();
+			getline(cin, filename);
+			fout.open(filename, ios::out);
+			if (fout.is_open())
+			{
+				fout << Pipes.size() << endl;
+				fout << CSs.size() << endl;
+				for (auto p : Pipes)
+					fout << p.second;
+				for (auto cs : CSs)
+					fout << cs.second;
+				fout.close();
+			}
+			else cout << "Файл не открывается" << endl;
+			break;
+		}
+		case 9: {
 			ifstream fin;
-			fin.open("file.txt", ios::in);
-			if (fin.is_open())
-			{
-				p = fromFilePipe(fin);
-				c = fromFileCS(fin);
+			string filename;
+			cout << "Введите название файла: ";
+			cin.ignore();
+			getline(cin, filename);
+			fin.open(filename, ios::in);
+			if (fin.is_open()) {
+				int number_of_pipes;
+				int number_of_CSs;
+				fin >> number_of_pipes;
+				fin >> number_of_CSs;
+				while (number_of_pipes--) {
+					Pipe p;
+					fin >> p;
+					Pipes.emplace(p.getid(), p);
+				}
+				while (number_of_CSs--) {
+					CS c;
+					fin >> c;
+					CSs.emplace(c.getid(), c);
+				}
+				fin.close();
 			}
-			else cout << "Ошибка:файла не существует" << endl;
-			fin.close();
+			else cout << "Файл не открывается" << endl;
 			break;
 		}
-		case 8:
-		{
+		case 10: {
 			system("cls");
 			break;
 		}
-		case 9: 
-		{
+		case 0: {
 			return 0;
-			break;
+		}
+		default: 
+		{
+			cout << "Ошибка: введите значение 0 до 10" << endl;
 		}
 		}
+		}
+
+		return 0;
 	}
-}
+
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
 // Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
 
