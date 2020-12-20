@@ -11,10 +11,34 @@ Pipe::Pipe() {
 	broken = false;
 }
 
-
 int Pipe::getid() const
 {
 	return id;
+}
+
+int Pipe::getweight() const
+{
+	return weight;
+}
+
+int Pipe::getlength() const
+{
+	return length;
+}
+
+int Pipe::getdiameter() const
+{
+	return diameter;
+}
+
+int Pipe::getstart() const
+{
+	return start;
+}
+
+int Pipe::getend() const
+{
+	return end;
 }
 
 int Pipe::getMaxID()
@@ -25,6 +49,23 @@ int Pipe::getMaxID()
 bool Pipe::getbroken() const
 {
 	return broken;
+}
+
+void Pipe::setstart(int new_start)
+{
+	start = new_start;
+}
+
+void Pipe::setend(int new_end)
+{
+	end = new_end;
+}
+
+
+
+void Pipe::used_status_change()
+{
+	used = !used;
 }
 
 void Pipe::Pipe_status_change()

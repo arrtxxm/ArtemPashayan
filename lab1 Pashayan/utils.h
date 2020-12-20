@@ -2,15 +2,17 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 template <typename T>
-T CheckValue(std::string text, T min, T max)
+T CheckValue(string text, T min, T max)
 {
-	T parameter;
-	std::cout << text;
-	while (!(std::cin >> parameter) || parameter < min || parameter > max) {
-		std::cin.clear();
-		std::cin.ignore(10000, '\n');
-		std::cout << text;
+	T value;
+	cout << text;
+	while (!(std::cin >> value) || value < min || value > max) {
+		cin.clear();
+		cin.ignore(10000, '\n');
+		cout << text;
 	}
-	return parameter;
+	return value;
 }

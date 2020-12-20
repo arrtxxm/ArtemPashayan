@@ -44,24 +44,9 @@ bool CheckByName(const CS& cs, string param) {
 }
 
 bool CheckByPercentOfWorkshops(const CS& cs, double param) {
-	double percentage_workshops = 1.0 - cs.getrunning_workshops() / (double)cs.getworkshops();
-	return (abs(percentage_workshops - param / 100.0) < 0.0001);
+	double percent_workshops = 1.0 - cs.getrunning_workshops() / (double)cs.getworkshops();
+	return (abs(percent_workshops - param / 100.0) < 0.0001);
 }
-
-
-
-//T& SelectPipeCS(vector <T>& v) {
-//	while (true) {
-//		unsigned int id = CheckValue("Введите ID: ", 0, 10000);
-//		int n = 0;
-//		for (auto& obj : v) {
-//			if (obj.getid() == id) {
-//				return v[n];
-//			}
-//			n++;
-//		}
-//	}
-//}
 
 template<class T>
 void DeletePipeCS(unordered_map <int, T>& m) 
@@ -73,13 +58,11 @@ void DeletePipeCS(unordered_map <int, T>& m)
 	else cout << "Такого ID не существует" << endl;
 }
 
-
 void EditingPipes(unordered_map<int, Pipe>& m, vector<int> EditedPipes) 
 {
-
 	int answer;
 	while (true) {
-		Print_second_menu("All found", "Slice");
+		Print_second_menu("All found", "Поиск по индексу");
 		answer = CheckValue("Your choice (0-2): ", 0, 2);
 		if (answer == 1) {
 			for (auto& i : EditedPipes) {
@@ -88,11 +71,11 @@ void EditingPipes(unordered_map<int, Pipe>& m, vector<int> EditedPipes)
 			break;
 		}
 		else if (answer == 2) {
-			int begin_slice = CheckValue("Type start index the slice: ", 0, Pipe::getMaxID());
-			int end_slice = CheckValue("Type end index of the slice: ", begin_slice, Pipe::getMaxID());
+			int from = CheckValue("Введите начальный индекс: ", 0, Pipe::getMaxID());
+			int to = CheckValue("Введите конечный индекс: ", from, Pipe::getMaxID());
 			int n = 0;
 			for (auto& p : m) {
-				if (p.second.getid() >= begin_slice && p.second.getid() <= end_slice) {
+				if (p.second.getid() >= from && p.second.getid() <= to) {
 					p.second.Pipe_status_change();
 				}
 				n++;
@@ -104,10 +87,6 @@ void EditingPipes(unordered_map<int, Pipe>& m, vector<int> EditedPipes)
 		}
 	}
 }
-
-
-
-
 
 void PrintMenu()
 {
@@ -134,7 +113,6 @@ void Print_second_menu(string clause1, string clause2)
 		<< "2. " << clause2 << "\n"
 		<< "-------------------" << endl;
 }
-
 
 int main()
 {

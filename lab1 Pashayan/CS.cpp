@@ -23,8 +23,6 @@ int CS::getMaxID()
 	return MaxID;
 }
 
-
-
 string CS::getname() const
 {
 	return name;
