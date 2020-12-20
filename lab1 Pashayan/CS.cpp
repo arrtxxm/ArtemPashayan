@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include "CS.h"
 #include "utils.h"

@@ -1,17 +1,18 @@
 ﻿// lab1 Pashayan.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
+#pragma once
 #include <math.h>
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
+
 #include "Pipe.h"
 #include "CS.h"
-
 #include "utils.h"
+#include "GTS.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ vector<int> FindObjectsByFilter(const unordered_map<int, T>& m, Filter<T, T_para
 }
 
 template <class T>
+
 bool CheckByID(const T& p, unsigned int param) {
 	return p.getid() == param;
 }
@@ -49,6 +51,7 @@ bool CheckByPercentOfWorkshops(const CS& cs, double param) {
 }
 
 template<class T>
+
 void DeletePipeCS(unordered_map <int, T>& m) 
 {
 	unsigned int id = CheckValue("Введите ID: ", 0, 10000);
@@ -101,6 +104,9 @@ void PrintMenu()
 		<< "8. Сохранение в файл" << "\n"
 		<< "9. Загрузка из файла" << "\n"
 		<< "10. Очистить консоль" << "\n"
+		<< "11. Добавить КС в ГТС" << "\n"
+		<< "12. Добавить трубу в ГТС" <<"\n"
+	    << "13. Соединить станции" <<"\n"
 		<< "0. Выход" << "\n"
 		<< "-------------------" << endl;
 }
@@ -119,33 +125,34 @@ int main()
 	setlocale(LC_ALL, "Russian");
 	unordered_map <int, Pipe> Pipes;
 	unordered_map <int, CS> CSs;
+	GTS GTS;
 	vector <int> EditedPipes;
 	while (true)
 	{
 		PrintMenu();
-		int choice = CheckValue("Выберите от 0 до 10: ", 0, 10);
+		int i = CheckValue("Выберите от 0 до 10: ", 0, 10);
 		cout << '\n';
-		switch (choice)
+		switch (i)
 		{
 		case 1:
 		{
 			while (true)
 			{
 				Print_second_menu("Труба", "КС");
-				int choice1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (choice1 == 1) 
+				int i1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (i1 == 1) 
 				{
 					Pipe pipe;
 					cin >> pipe;
 					Pipes.emplace(pipe.getid(), pipe);
 				}
-				else if (choice1 == 2) 
+				else if (i1 == 2) 
 				{
 					CS cs;
 					cin >> cs;
 					CSs.emplace(cs.getid(), cs);
 				}
-				else if (choice1 == 0) 
+				else if (i1 == 0) 
 				{
 					break;
 				}
@@ -180,9 +187,9 @@ int main()
 		case 3: {
 			while (true) {
 				Print_second_menu("Труба", "КС");
-				int choice3 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (choice3 == 1) {
-					int ID = CheckValue("Введите ID:", 1u, Pipes.size());
+				int i2 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (i2 == 1) {
+					int ID = CheckValue("Введите ID: ", 1u, Pipes.size());
 					if (Pipes.size() != 0) {
 						if (Pipes.count(ID))
 							Pipes[ID].Pipe_status_change();
@@ -192,7 +199,7 @@ int main()
 						cout << "Вы еще не создавали трубы" << endl;
 					}
 				}
-				else if (choice3 == 2) {
+				else if (i2 == 2) {
 					int ID = CheckValue("Введите ID:", 1u, CSs.size());
 					if (CSs.size() != 0) {
 						CSs[ID].edit_CS();
@@ -201,7 +208,7 @@ int main()
 						cout << "Вы еще не создавали КС" << endl;
 					}
 				}
-				else if (choice3 == 0) {
+				else if (i2 == 0) {
 					cout << '\n';
 					break;
 				}
@@ -214,8 +221,8 @@ int main()
 		case 4: {
 			while (true) {
 				Print_second_menu("Труба", "КС");
-				int choice1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (choice1 == 1) {
+				int i3 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (i3 == 1) {
 					if (Pipes.size() != 0) {
 						DeletePipeCS(Pipes);
 					}
@@ -223,7 +230,7 @@ int main()
 						cout << "Вы еще не создавали трубы" << endl;
 					}
 				}
-				else if (choice1 == 2) {
+				else if (i3 == 2) {
 					if (CSs.size() != 0) {
 						DeletePipeCS(CSs);
 					}
@@ -231,7 +238,7 @@ int main()
 						cout << "Вы еще не создавали КС" << endl;
 					}
 				}
-				else if (choice1 == 0) {
+				else if (i3 == 0) {
 					cout << '\n';
 					break;
 				}
@@ -244,8 +251,8 @@ int main()
 		case 5: {
 			while (true) {
 				Print_second_menu("Поиск по ID", "Поиск по статусу в ремонте ");
-				int choice5 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (choice5 == 1) {
+				int i4 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (i4 == 1) {
 					unsigned int id_to_find;
 					id_to_find = CheckValue("Введите ID: ", 0u, 10000u);
 					for (int i : FindObjectsByFilter(Pipes, CheckByID, id_to_find)) {
@@ -253,7 +260,7 @@ int main()
 						EditedPipes.push_back(i);
 					}
 				}
-				else if (choice5 == 2) {
+				else if (i4 == 2) {
 					bool is_broken_status_to_find;
 					is_broken_status_to_find = CheckValue("В ремонте? [да-1/нет-0]: ", false, true);
 					for (int i : FindObjectsByFilter(Pipes, CheckByBroken, is_broken_status_to_find)) {
@@ -261,7 +268,7 @@ int main()
 						EditedPipes.push_back(i);
 					}
 				}
-				else if (choice5 == 0) {
+				else if (i4 == 0) {
 					break;
 				}
 				else {
@@ -275,8 +282,8 @@ int main()
 			while (true) 
 			{
 				Print_second_menu("Поиск по имени", "Поиск по проценту незадействованных цехов");
-				int choice6 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (choice6 == 1) {
+				int i5 = CheckValue("Выберите от 0 до 2: ", 0, 2);
+				if (i5 == 1) {
 					string name_to_find;
 					cout << "Введите имя КС: ";
 					cin.get();
@@ -285,14 +292,14 @@ int main()
 						cout << CSs[i] << endl;
 					}
 				}
-				else if (choice6 == 2) {
+				else if (i5 == 2) {
 					double percentage_to_find;
 					percentage_to_find = CheckValue("Введите значение в процентах (0-100%): ", 0.0, 100.0);
 					for (int i : FindObjectsByFilter(CSs, CheckByPercentOfWorkshops, percentage_to_find)) {
 						cout << CSs[i] << endl;
 					}
 				}
-				else if (choice6 == 0) {
+				else if (i5 == 0) {
 					break;
 				}
 				else {
@@ -357,8 +364,24 @@ int main()
 			else cout << "Файл не открывается" << endl;
 			break;
 		}
-		case 10: {
+		case 10: 
+		{
 			system("cls");
+			break;
+		}
+		case 11: 
+		{ 
+			GTS.add_cs(CSs, CheckValue("Введите ID КС: ", 0, CS::getMaxID()));			
+			break;
+		}
+		case 12: 
+		{
+			GTS.add_pipe(Pipes,CheckValue("Введите ID трубы:", 0, Pipe::getMaxID()));
+			break;
+		}
+		case 13: 
+		{
+			GTS.create_adjmatr(CSs, Pipes);
 			break;
 		}
 		case 0: {

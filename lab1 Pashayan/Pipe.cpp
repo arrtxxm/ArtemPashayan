@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include "Pipe.h"
 #include "utils.h"
