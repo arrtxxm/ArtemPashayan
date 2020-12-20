@@ -39,10 +39,16 @@ void GTS::connect_vertices(unordered_map<int, CS>& mapCS, unordered_map<int, Pip
 
 void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>& mapPipe)
 {
-	AdjMatr.clear();
 	int n = Edges.size();
 	AdjMatr.resize(n);
-	for (int i = 0; i < n; i++) { AdjMatr[i].resize(n); }
+	if (Is_Changed) {
+		AdjMatr.clear();
+		AdjMatr.resize(n);
+		for (int i = 0; i < n; i++) {
+			AdjMatr[i].resize(n);
+			Is_Changed = false;
+		}
+	}
 	for (auto itr = mapPipe.begin(); itr != mapPipe.end(); itr++) {
 		if (itr->second.getstart() != -1) {
 			AdjMatr[get_csindex(itr->second.getstart())][get_csindex(itr->second.getend())] = 1;
@@ -52,7 +58,28 @@ void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>
 
 		for (int j = 0; j < n; j++) {
 			cout << AdjMatr[i][j] << " ";
-		}
+		}	
 		cout << endl;
 	}
+}
+
+void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
+{
+	Is_Changed = true;
+	Edges.erase(id);
+	IdIndexCS.erase(id);
+
+	for (auto iter = mapPipe.begin(); iter != mapPipe.end(); iter++) {
+		if (iter->second.getstart() == id || iter->second.getend() == id) {
+			delete_vertices(iter->first);
+		}
+	}
+}
+
+void GTS::delete_vertices(int id)
+{
+	Is_Changed = true;
+	Vertices.erase(Vertices.find(id));
+	IdIndexPipe.erase(id);
+
 }

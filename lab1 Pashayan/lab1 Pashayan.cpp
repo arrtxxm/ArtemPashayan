@@ -107,6 +107,7 @@ void PrintMenu()
 		<< "11. Добавить КС в ГТС" << "\n"
 		<< "12. Добавить трубу в ГТС" <<"\n"
 	    << "13. Соединить станции" <<"\n"
+		<< "13. Создать матрицу смежности" << "\n"
 		<< "0. Выход" << "\n"
 		<< "-------------------" << endl;
 }
@@ -130,7 +131,7 @@ int main()
 	while (true)
 	{
 		PrintMenu();
-		int i = CheckValue("Выберите от 0 до 10: ", 0, 10);
+		int i = CheckValue("Выберите от 0 до 14: ", 0, 14);
 		cout << '\n';
 		switch (i)
 		{
@@ -380,6 +381,11 @@ int main()
 			break;
 		}
 		case 13: 
+		{
+			GTS.connect_vertices(CSs, Pipes);
+			break;
+		}
+		case 14:
 		{
 			GTS.create_adjmatr(CSs, Pipes);
 			break;
