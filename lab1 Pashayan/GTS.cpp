@@ -110,7 +110,7 @@ void GTS::topological_sort(int index, vector<int>& colors, bool& cycl, vector<in
 
 void GTS::sort()
 {
-	vector<int> colors;
+	vector<int> colors;// массив, хранящий кол-во посещений для данной вершины.
 	colors.resize(Edges.size());
 	vector<int> SortedVector;
 	bool cycl = false;
@@ -118,10 +118,10 @@ void GTS::sort()
 		topological_sort(i, colors, cycl, SortedVector);
 	}
 	if (cycl) {
-		cout << "There is cycle" << endl;
+		cout << "Граф цикличен" << endl;
 	}
 	else {
-		cout << "Topological sort: " << endl;
+		cout << "Топологическая сортировка: " << endl;
 		for (int i = 0; i < SortedVector.size(); i++) {
 			cout << SortedVector[i] << " ";              
 		}
