@@ -1,21 +1,14 @@
 #include <iostream>
 #include "CS.h"
 #include "utils.h"
+
 using namespace std;
 
 int CS::MaxID = 0;
 
-CS::CS() {
-	id = ++MaxID;
-	string name = "Unknown";
-	workshops = 0;
-	running_workshops = 0;
-	efficiency = 0;
-}
-
-int CS::getid() const
+string CS::getname() const
 {
-	return id;
+	return name;
 }
 
 int CS::getMaxID()
@@ -23,9 +16,9 @@ int CS::getMaxID()
 	return MaxID;
 }
 
-string CS::getname() const
+int CS::getid() const
 {
-	return name;
+	return id;
 }
 
 int CS::getworkshops() const 
@@ -38,9 +31,44 @@ int CS::getrunning_workshops() const
 	return running_workshops;
 }
 
-void CS::edit_CS() {
-	running_workshops = CheckValue("Введите количество заводов в работе: ", 0, workshops);
+double CS::getefficiency() const
+{
+	return efficiency;
 }
+
+void CS::edit_CS() {
+	running_workshops = CheckValue("Введите количество цехов в работе: ", 0, workshops);
+}
+
+void CS::stop_CS()
+{
+	if (running_workshops > 0) {
+		running_workshops--;
+	}
+	else {
+		cout << "Нет цехов в работе" << endl;
+	}	
+}
+
+void CS::run_CS()
+{
+	if (running_workshops < workshops) {
+		running_workshops++;
+	}
+	else {
+		cout << "Все цеха в работе" << endl;
+	}
+}
+
+
+CS::CS() {
+	id = ++MaxID;
+	string name = "Unknown";
+	workshops = 0;
+	running_workshops = 0;
+	efficiency = 0.0;
+}
+
 
 istream& operator >> (istream& in, CS& cs)
 {

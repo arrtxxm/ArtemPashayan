@@ -1,5 +1,7 @@
+#include <iostream>
 #include "Pipe.h"
 #include "utils.h"
+
 using namespace std;
 
 int Pipe::MaxID = 0;

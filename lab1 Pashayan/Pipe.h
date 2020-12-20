@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+
 using namespace std;
 
 class Pipe
@@ -40,5 +41,7 @@ public:
 
 	void used_status_change();
 	void Pipe_status_change();
+
 	Pipe();
+
 };

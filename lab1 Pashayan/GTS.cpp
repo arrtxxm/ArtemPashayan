@@ -2,40 +2,57 @@
 #include "GTS.h"
 #include "utils.h"
 
-int GTS::GetCsIndex(int id) const
+int GTS::get_csindex(int id) const
 {
 	return IdIndexCS.find(id)->second;
 }
 
-void GTS::AddCS(const unordered_map<int, CS>& map, int id) 
+void GTS::add_cs(const unordered_map<int, CS>& map, int id) 
 {
-	edges.insert(map.find(id)->first);
-	IdIndexCS.insert({ id, edges.size() - 1 });
+	Edges.insert(map.find(id)->first);
+	IdIndexCS.insert({ id, Edges.size() - 1 });
 	cout << "CS added ID: " << IdIndexCS.find(id)->first << " Index: " << IdIndexCS.find(id)->second << endl;
-	is_changed = true;
+	Is_Changed = true;
 
 }
 
-void GTS::AddPipe(const unordered_map<int, Pipe>& map, int id)
+void GTS::add_pipe(const unordered_map<int, Pipe>& map, int id)
 {
 
-	vertices.insert(map.find(id)->first);
-	IdIndexPipe.insert({ id, vertices.size() - 1 });
+	Vertices.insert(map.find(id)->first);
+	IdIndexPipe.insert({ id, Vertices.size() - 1 });
 	cout << "Pipe added ID: " << IdIndexPipe.find(id)->first << " Index: " << IdIndexPipe.find(id)->second << endl;
-	is_changed = true;
+	Is_Changed = true;
 }
 
 
-void GTS::ConnectEdges(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>& mapPipe)
+void GTS::connect_vertices(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>& mapPipe)
 {
-	cout << "Enter start CS: " << endl;
-	int CSId1 = CheckValue("Enter start CS", 0, CS::getMaxID());
-	int pipeId = CheckValue("Enter Pipe: ", 0, Pipe::getMaxID()); 
-	int CSId2 = CheckValue("Enter final CS: ", 0, CS::getMaxID());
+	int CSId1 = CheckValue("Выберите начальную КС", 0, CS::getMaxID());
+	int pipeId = CheckValue("Выберите трубу: ", 0, Pipe::getMaxID()); 
+	int CSId2 = CheckValue("Выберите конечную КС: ", 0, CS::getMaxID());
 	mapPipe.find(pipeId)->second.setstart(CSId1);
 	mapPipe.find(pipeId)->second.setend(CSId2);
-	cout << "CS: " << CSId1 << " was connected with CS: " << CSId2 << "by Pipe with id: " << pipeId << endl;
-
-	is_changed = true;
+	cout << "КС: " << CSId1 << " была соединена с КС : " << CSId2 << "трубой с ID: " << pipeId << endl;
+	Is_Changed = true;
 }
 
+void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>& mapPipe)
+{
+	AdjMatr.clear();
+	int n = Edges.size();
+	AdjMatr.resize(n);
+	for (int i = 0; i < n; i++) { AdjMatr[i].resize(n); }
+	for (auto itr = mapPipe.begin(); itr != mapPipe.end(); itr++) {
+		if (itr->second.getstart() != -1) {
+			AdjMatr[get_csindex(itr->second.getstart())][get_csindex(itr->second.getend())] = 1;
+		}
+	}
+	for (int i = 0; i < n; i++) {
+
+		for (int j = 0; j < n; j++) {
+			cout << AdjMatr[i][j] << " ";
+		}
+		cout << endl;
+	}
+}

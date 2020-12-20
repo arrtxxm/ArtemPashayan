@@ -10,35 +10,34 @@ using namespace std;
 
 class GTS
 {
-	unordered_set<int> edges; //id ребер
-	unordered_set<int> vertices; //id вершины
+	unordered_set<int> Edges; 
+	unordered_set<int> Vertices; 
 
 	unordered_map<int, int> IdIndexCS;
 	unordered_map<int, int> IdIndexPipe;
 
 	vector<vector<int>> AdjMatr;
 	vector<vector<int>> IncMatr;
-	bool is_changed;
+
+	bool Is_Changed;
 
 public:
-	int GetCsIndex(int) const;
+	int get_csindex(int) const;
 
-	void AddCS(const unordered_map<int, CS>&, int);
+	void add_cs(const unordered_map<int, CS>&, int);
 
-	void AddPipe(const unordered_map<int, Pipe>&, int);
+	void add_pipe(const unordered_map<int, Pipe>&, int);
 
-	void ConnectEdges(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
+	void connect_vertices(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
 
+	void create_adjmatr(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
 
-	void CreateAdjacencyMatrix(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
+	void delete_edge(int, unordered_map<int, Pipe>&);
 
+	void delete_vertices(int);
 
-	void DeleteEdge(int, unordered_map<int, Pipe>&);
+	void topological_sort(int, vector<int>&, bool&, vector<int>&);
 
-	void DeleteVertex(int);
-
-	void TopologicalSort(int, vector<int>&, bool&, vector<int>&);
-
-	void TopSort();
+	void sort();
 
 };
