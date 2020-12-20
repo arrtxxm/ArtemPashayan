@@ -388,6 +388,7 @@ int main()
 		case 14:
 		{
 			GTS.create_adjmatr(CSs, Pipes);
+			GTS.sort();
 			break;
 		}
 		case 0: {

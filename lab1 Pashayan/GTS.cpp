@@ -83,3 +83,48 @@ void GTS::delete_vertices(int id)
 	IdIndexPipe.erase(id);
 
 }
+
+void GTS::topological_sort(int index, vector<int>& colors, bool& cycl, vector<int>& TopSortedVector)
+{
+	if (colors[index] == 2)
+		return;
+	if (cycl)
+		return;
+	if (colors[index] == 1) {
+		cycl = true;
+		return;
+	}
+	colors[index] = 1;
+	for (int i = 0; i < Edges.size(); i++) {
+		if (AdjMatr[index][i] == 1) {
+			int AdjEdge = i;
+			topological_sort(AdjEdge, colors, cycl, TopSortedVector);
+			if (cycl)
+				return;
+		}
+
+	}
+	colors[index] = 2;
+	TopSortedVector.push_back(index);
+}
+
+void GTS::sort()
+{
+	vector<int> colors;
+	colors.resize(Edges.size());
+	vector<int> SortedVector;
+	bool cycl = false;
+	for (int i = 0; i < Edges.size(); i++) {
+		topological_sort(i, colors, cycl, SortedVector);
+	}
+	if (cycl) {
+		cout << "There is cycle" << endl;
+	}
+	else {
+		cout << "Topological sort: " << endl;
+		for (int i = 0; i < SortedVector.size(); i++) {
+			cout << SortedVector[i] << " ";              
+		}
+		cout << endl;
+	}
+}
