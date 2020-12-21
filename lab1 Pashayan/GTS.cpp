@@ -67,7 +67,7 @@ void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
 
 	for (auto iter = mapPipe.begin(); iter != mapPipe.end(); iter++) {
 		if (iter->second.getstart() == id || iter->second.getend() == id) {
-			delete_vertices(iter->first);
+		/*	delete_vertices(iter->first);*/
 			mapPipe.erase(iter->first);
 			break;
 		}

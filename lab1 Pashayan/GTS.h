@@ -17,7 +17,6 @@ class GTS
 	unordered_map<int, int> IdIndexPipe;
 
 	vector<vector<int>> AdjMatr;
-	vector<vector<int>> IncMatr;
 
 	bool Is_Changed;
 

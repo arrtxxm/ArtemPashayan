@@ -136,7 +136,7 @@ int main()
 	while (true)
 	{
 		PrintMenu();
-		int i = CheckValue("Выберите от 0 до 14: ", 0, 14);
+		int i = CheckValue("Выберите от 0 до 16: ", 0, 16);
 		cout << '\n';
 		switch (i)
 		{
@@ -399,10 +399,10 @@ int main()
 		case 15:
 		{
 			while (1) {				
-				int id = CheckValue("Enter the id ", 0, Pipe::getMaxID());
+				int id = CheckValue("Введите ID ", 0, Pipe::getMaxID());
 				if (del(Pipes, id)) {
 					GTS.delete_vertices(id);
-					cout << "Truba ydalena" << endl;
+					cout << "Труба удалена" << endl;
 				}
 				else
 					cout << "Deletion not executed" << endl;
