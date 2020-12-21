@@ -16,12 +16,12 @@ class Pipe
 	bool broken;
 	bool used;
 
-	double weight;
+	//double weight;
 	double length;
 	
 public:	
 	int getid() const;
-	int getweight() const;
+	//int getweight() const;
 	int getlength() const;
 	int getdiameter() const;
 	int getstart() const;

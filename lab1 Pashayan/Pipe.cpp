@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <string>
+#include <fstream>
 #include "Pipe.h"
 #include "utils.h"
 
@@ -7,22 +9,17 @@ using namespace std;
 
 int Pipe::MaxID = 0;
 
-Pipe::Pipe() {
-	id = MaxID++;
-	length = 0;
-	diameter = 0;
-	broken = false;
-}
+
 
 int Pipe::getid() const
 {
 	return id;
 }
 
-int Pipe::getweight() const
-{
-	return weight;
-}
+//int Pipe::getweight() const
+//{
+//	return weight;
+//}
 
 int Pipe::getlength() const
 {
@@ -87,7 +84,7 @@ istream& operator >> (istream& in, Pipe& p)
 
 ostream& operator << (ostream& out, const Pipe& p)
 {
-	out << "\nВывести информацию о трубе " << p.id << "\n"
+	out << "\nИнформация о трубе " << p.id << "\n"
 		<< "Длина трубы: " << p.length << "\n"
 		<< "Диаметр трубы: " << p.diameter << "\n"
 		<< "Статус трубы: " << p.broken
@@ -106,4 +103,14 @@ ofstream& operator<<(ofstream& fout, const Pipe& p)
 	fout << p.id << endl << p.length << endl
 		<< p.diameter << endl << p.broken << endl;
 	return fout;
+}
+
+Pipe::Pipe() {
+	id = MaxID++;
+	length = 0.0;
+	diameter = 0;
+	broken = false;
+	used = false;
+	start = -1;
+	end = -1;
 }

@@ -12,7 +12,7 @@ void GTS::add_cs(const unordered_map<int, CS>& map, int id)
 	Edges.insert(map.find(id)->first);
 	IdIndexCS.insert({ id, Edges.size() - 1 });
 	cout << "CS added ID: " << IdIndexCS.find(id)->first << " Index: " << IdIndexCS.find(id)->second << endl;
-	Is_Changed = true;
+	Is_Changed = true;	
 
 }
 
@@ -33,7 +33,7 @@ void GTS::connect_vertices(unordered_map<int, CS>& mapCS, unordered_map<int, Pip
 	int CSId2 = CheckValue("Выберите конечную КС: ", 0, CS::getMaxID());
 	mapPipe.find(pipeId)->second.setstart(CSId1);
 	mapPipe.find(pipeId)->second.setend(CSId2);
-	cout << "КС: " << CSId1 << " была соединена с КС : " << CSId2 << "трубой с ID: " << pipeId << endl;
+	cout << "КС: " << CSId1 << " была соединена с КС : " << CSId2 << " трубой с ID: " << pipeId << endl;
 	Is_Changed = true;
 }
 
@@ -83,7 +83,7 @@ void GTS::delete_vertices(int id)
 	IdIndexPipe.erase(id);
 
 }
-
+		
 void GTS::topological_sort(int index, vector<int>& colors, bool& cycl, vector<int>& TopSortedVector)
 {
 	if (colors[index] == 2)

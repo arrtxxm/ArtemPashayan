@@ -60,11 +60,11 @@ void CS::run_CS()
 		cout << "Все цеха в работе" << endl;
 	}
 }
-
+	
 
 CS::CS() {
 	id = ++MaxID;
-	string name = "Unknown";
+	name = "Unknown";
 	workshops = 0;
 	running_workshops = 0;
 	efficiency = 0.0;
@@ -84,7 +84,7 @@ istream& operator >> (istream& in, CS& cs)
 
 ostream& operator << (ostream& out, const CS& cs)
 {
-	out << "\nВывести информацию о КС " << cs.id << "\n"
+	out << "\nИнформация о КС " << cs.id << "\n"
 		<< "Имя КС: " << cs.name << "\n"
 		<< "Количество заводов: " << cs.workshops << "\n"
 		<< "Количество заводов в работе: " << cs.running_workshops << "\n"

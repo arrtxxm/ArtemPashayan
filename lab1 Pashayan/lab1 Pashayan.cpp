@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-
 #include "Pipe.h"
 #include "CS.h"
 #include "utils.h"
@@ -107,7 +106,7 @@ void PrintMenu()
 		<< "11. Добавить КС в ГТС" << "\n"
 		<< "12. Добавить трубу в ГТС" <<"\n"
 	    << "13. Соединить станции" <<"\n"
-		<< "13. Создать матрицу смежности" << "\n"
+		<< "14. Топологическая сортировка" << "\n"
 		<< "0. Выход" << "\n"
 		<< "-------------------" << endl;
 }
@@ -141,23 +140,23 @@ int main()
 			{
 				Print_second_menu("Труба", "КС");
 				int i1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i1 == 1) 
+				if (i1 == 1)
 				{
 					Pipe pipe;
 					cin >> pipe;
 					Pipes.emplace(pipe.getid(), pipe);
 				}
-				else if (i1 == 2) 
+				else if (i1 == 2)
 				{
 					CS cs;
 					cin >> cs;
 					CSs.emplace(cs.getid(), cs);
 				}
-				else if (i1 == 0) 
+				else if (i1 == 0)
 				{
 					break;
 				}
-				else 
+				else
 				{
 					cout << "Ошибка: выберите от 0 до 2" << endl;
 				}
@@ -167,7 +166,7 @@ int main()
 		case 2:
 		{
 			if (Pipes.size() != 0) {
-				for (auto& p : Pipes) 
+				for (auto& p : Pipes)
 				{
 					cout << p.second << endl;
 				}
@@ -278,9 +277,9 @@ int main()
 			}
 			break;
 		}
-		case 6: 
+		case 6:
 		{
-			while (true) 
+			while (true)
 			{
 				Print_second_menu("Поиск по имени", "Поиск по проценту незадействованных цехов");
 				int i5 = CheckValue("Выберите от 0 до 2: ", 0, 2);
@@ -365,22 +364,22 @@ int main()
 			else cout << "Файл не открывается" << endl;
 			break;
 		}
-		case 10: 
+		case 10:
 		{
 			system("cls");
 			break;
 		}
-		case 11: 
-		{ 
-			GTS.add_cs(CSs, CheckValue("Введите ID КС: ", 0, CS::getMaxID()));			
-			break;
-		}
-		case 12: 
+		case 11:
 		{
-			GTS.add_pipe(Pipes,CheckValue("Введите ID трубы:", 0, Pipe::getMaxID()));
+			GTS.add_cs(CSs, CheckValue("Введите ID КС: ", 0, CS::getMaxID()));
 			break;
 		}
-		case 13: 
+		case 12:
+		{
+			GTS.add_pipe(Pipes, CheckValue("Введите ID трубы:", 0, Pipe::getMaxID()));
+			break;
+		}
+		case 13:
 		{
 			GTS.connect_vertices(CSs, Pipes);
 			break;
@@ -391,18 +390,18 @@ int main()
 			GTS.sort();
 			break;
 		}
-		case 0: {
+		case 0:\
+		{
 			return 0;
 		}
-		default: 
+		default:
 		{
 			cout << "Ошибка: введите значение 0 до 10" << endl;
 		}
 		}
-		}
-
-		return 0;
 	}
+		return 0;
+}
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
 // Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
