@@ -107,6 +107,8 @@ void PrintMenu()
 		<< "12. Добавить трубу в ГТС" <<"\n"
 	    << "13. Соединить станции" <<"\n"
 		<< "14. Топологическая сортировка" << "\n"
+		<< "15. Удаление труб" << "\n"
+		<< "16. Удаление КС" << "\n"
 		<< "0. Выход" << "\n"
 		<< "-------------------" << endl;
 }
@@ -120,6 +122,10 @@ void Print_second_menu(string clause1, string clause2)
 		<< "-------------------" << endl;
 }
 
+template<typename T>
+bool del(unordered_map<int, T>& map, int id) {
+	return map.erase(id);
+}
 int main()
 {
 	setlocale(LC_ALL, "Russian");
@@ -390,7 +396,37 @@ int main()
 			GTS.sort();
 			break;
 		}
-		case 0:\
+		case 15:
+		{
+			while (1) {				
+				int id = CheckValue("Enter the id ", 0, Pipe::getMaxID());
+				if (del(Pipes, id)) {
+					GTS.delete_vertices(id);
+					cout << "Truba ydalena" << endl;
+				}
+				else
+					cout << "Deletion not executed" << endl;
+				if (CheckValue("Продолжить удаление? 1-Да\0-Нет", 0, 1) == 0)
+					break;
+			}
+			break;
+		}
+		case 16:
+		{
+			while (1) {
+				int id = CheckValue("ID кс для удаления", 0, CS::getMaxID());
+				if (del(CSs, id)) {
+					GTS.delete_edge(id, Pipes);
+					cout << "КС успешно удалена" << endl;
+				}
+				else
+					cout << "КС с таким ID не найлена" << endl;
+				if (CheckValue("Продолжить удаление? 1-Да/0-Нет", 0, 1) == 0)
+					break;
+			}
+			break;
+		}
+		case 0:
 		{
 			return 0;
 		}
@@ -398,6 +434,7 @@ int main()
 		{
 			cout << "Ошибка: введите значение 0 до 10" << endl;
 		}
+		
 		}
 	}
 		return 0;

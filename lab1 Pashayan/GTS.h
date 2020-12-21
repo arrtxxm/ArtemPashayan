@@ -22,7 +22,9 @@ class GTS
 	bool Is_Changed;
 
 public:
-	int get_csindex(int) const;
+	int get_csindex(int) const;	
+	
+	int GetCsId(int) const;
 
 	void add_cs(const unordered_map<int, CS>&, int);
 
@@ -39,5 +41,8 @@ public:
 	void topological_sort(int, vector<int>&, bool&, vector<int>&);
 
 	void sort();
+
+	void UpdateIndexCS();
+
 
 };

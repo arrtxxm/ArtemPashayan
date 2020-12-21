@@ -40,8 +40,8 @@ void GTS::connect_vertices(unordered_map<int, CS>& mapCS, unordered_map<int, Pip
 void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>& mapPipe)
 {
 	int n = Edges.size();
-	AdjMatr.resize(n);
 	if (Is_Changed) {
+		UpdateIndexCS();
 		AdjMatr.clear();
 		AdjMatr.resize(n);
 		for (int i = 0; i < n; i++) {
@@ -54,13 +54,13 @@ void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>
 			AdjMatr[get_csindex(itr->second.getstart())][get_csindex(itr->second.getend())] = 1;
 		}
 	}
-	for (int i = 0; i < n; i++) {
+	/*for (int i = 0; i < n; i++) {
 
 		for (int j = 0; j < n; j++) {
 			cout << AdjMatr[i][j] << " ";
 		}	
 		cout << endl;
-	}
+	}*/
 }
 
 void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
@@ -72,6 +72,8 @@ void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
 	for (auto iter = mapPipe.begin(); iter != mapPipe.end(); iter++) {
 		if (iter->second.getstart() == id || iter->second.getend() == id) {
 			delete_vertices(iter->first);
+			mapPipe.erase(iter->first);
+			break;
 		}
 	}
 }
@@ -79,7 +81,8 @@ void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
 void GTS::delete_vertices(int id)
 {
 	Is_Changed = true;
-	Vertices.erase(Vertices.find(id));
+	/*Vertices.erase(Vertices.find(id));*/
+	Vertices.erase(id);
 	IdIndexPipe.erase(id);
 
 }
@@ -105,7 +108,7 @@ void GTS::topological_sort(int index, vector<int>& colors, bool& cycl, vector<in
 
 	}
 	colors[index] = 2;
-	TopSortedVector.push_back(index);
+	TopSortedVector.push_back(GetCsId(index));
 }
 
 void GTS::sort()
@@ -121,10 +124,29 @@ void GTS::sort()
 		cout << "Граф цикличен" << endl;
 	}
 	else {
+		reverse(SortedVector.begin(), SortedVector.end());
 		cout << "Топологическая сортировка: " << endl;
 		for (int i = 0; i < SortedVector.size(); i++) {
 			cout << SortedVector[i] << " ";              
 		}
 		cout << endl;
 	}
+}
+
+void GTS::UpdateIndexCS()
+{
+	int i = 0;
+	for (auto iter = IdIndexCS.begin(); iter != IdIndexCS.end(); iter++) {
+		iter->second = i;
+		++i;
+	}
+}
+
+int GTS::GetCsId(int index) const
+{
+	for (auto iter = IdIndexCS.begin(); iter != IdIndexCS.end(); iter++) {
+		if (iter->second == index)
+			return iter->first;
+	}
+	return 0;
 }
