@@ -42,7 +42,7 @@ public:
 
 	void sort();
 
-	void UpdateIndexCS();
+	void UpdateIndex();
 
 
 };

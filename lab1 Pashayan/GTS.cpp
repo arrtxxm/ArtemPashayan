@@ -2,6 +2,8 @@
 #include "GTS.h"
 #include "utils.h"
 
+
+
 int GTS::get_csindex(int id) const
 {
 	return IdIndexCS.find(id)->second;
@@ -41,7 +43,7 @@ void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>
 {
 	int n = Edges.size();
 	if (Is_Changed) {
-		UpdateIndexCS();
+		UpdateIndex();
 		AdjMatr.clear();
 		AdjMatr.resize(n);
 		for (int i = 0; i < n; i++) {
@@ -54,13 +56,7 @@ void GTS::create_adjmatr(unordered_map<int, CS>& mapCS, unordered_map<int, Pipe>
 			AdjMatr[get_csindex(itr->second.getstart())][get_csindex(itr->second.getend())] = 1;
 		}
 	}
-	/*for (int i = 0; i < n; i++) {
 
-		for (int j = 0; j < n; j++) {
-			cout << AdjMatr[i][j] << " ";
-		}	
-		cout << endl;
-	}*/
 }
 
 void GTS::delete_edge(int id, unordered_map<int, Pipe>& mapPipe)
@@ -133,12 +129,16 @@ void GTS::sort()
 	}
 }
 
-void GTS::UpdateIndexCS()
+void GTS::UpdateIndex()
 {
 	int i = 0;
 	for (auto iter = IdIndexCS.begin(); iter != IdIndexCS.end(); iter++) {
 		iter->second = i;
 		++i;
+	}
+	i = 0;
+	for (auto iter = IdIndexPipe.begin(); iter != IdIndexPipe.end(); iter++) {
+		iter->second = i;
 	}
 }
 
