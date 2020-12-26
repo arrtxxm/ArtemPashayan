@@ -1,444 +1,226 @@
 ﻿// lab1 Pashayan.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
-#pragma once
-#include <math.h>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
-#include <unordered_map>
-#include "Pipe.h"
-#include "CS.h"
-#include "utils.h"
+#include <conio.h>
+#include <fstream>
+#include <windows.h>
 #include "GTS.h"
-
+#include "utils.h"
 using namespace std;
 
-void Print_second_menu(string clause1, string clause2);
-
-template<class T, typename T_param>
-using Filter = bool(*)(const T& obj, T_param param);
-
-template<class T, typename T_param>
-vector<int> FindObjectsByFilter(const unordered_map<int, T>& m, Filter<T, T_param> f, T_param param) {
-	vector <int> res;
-	for (auto& obj : m) {
-		if (f(obj.second, param))
-			res.push_back(obj.first);
-	}
-	return res;
-}
-
-template <class T>
-
-bool CheckByID(const T& p, unsigned int param) {
-	return p.getid() == param;
-}
-
-bool CheckByBroken(const Pipe& p, bool param) {
-	return p.getbroken() == param;
-}
-
-bool CheckByName(const CS& cs, string param) {
-	return cs.getname() == param;
-}
-
-bool CheckByPercentOfWorkshops(const CS& cs, double param) {
-	double percent_workshops = 1.0 - cs.getrunning_workshops() / (double)cs.getworkshops();
-	return (abs(percent_workshops - param / 100.0) < 0.0001);
-}
-
-template<class T>
-
-void DeletePipeCS(unordered_map <int, T>& m) 
+void PrintTitle(string title)
 {
-	unsigned int id = CheckValue("Введите ID: ", 0, 10000);
-	int n = 0;
-	bool is_finded = false;
-	if (m.count(id) == 1) m.erase(id);
-	else cout << "Такого ID не существует" << endl;
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, (WORD)((7 << 4) | 0));
+	cout << '\n' << ' ' << title << ' ';
+	SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+	cout << endl;
 }
 
-void EditingPipes(unordered_map<int, Pipe>& m, vector<int> EditedPipes) 
-{
-	int answer;
-	while (true) {
-		Print_second_menu("All found", "Поиск по индексу");
-		answer = CheckValue("Your choice (0-2): ", 0, 2);
-		if (answer == 1) {
-			for (auto& i : EditedPipes) {
-				m[i].Pipe_status_change();
-			}
-			break;
-		}
-		else if (answer == 2) {
-			int from = CheckValue("Введите начальный индекс: ", 0, Pipe::getMaxID());
-			int to = CheckValue("Введите конечный индекс: ", from, Pipe::getMaxID());
-			int n = 0;
-			for (auto& p : m) {
-				if (p.second.getid() >= from && p.second.getid() <= to) {
-					p.second.Pipe_status_change();
-				}
-				n++;
-			}
-		}
-		else 
-		{
-			break;
-		}
-	}
-}
-
-void PrintMenu()
-{
-	cout << "-------------------\n"
-		<< "1. Создание трубы или КС" << "\n"
-		<< "2. Вывод всех объектов" << "\n"
-		<< "3. Редактирование трубы или КС" << "\n"
-		<< "4. Удаление трубы или КС" << "\n"
-		<< "5. Поиск труб по заданному фильтру" << "\n"
-		<< "6. Поиск КС по заданному фильтру" << "\n"
-		<< "7. Пакетное редактирование труб" << "\n"
-		<< "8. Сохранение в файл" << "\n"
-		<< "9. Загрузка из файла" << "\n"
-		<< "10. Очистить консоль" << "\n"
-		<< "11. Добавить КС в ГТС" << "\n"
-		<< "12. Добавить трубу в ГТС" <<"\n"
-	    << "13. Соединить станции" <<"\n"
-		<< "14. Топологическая сортировка" << "\n"
-		<< "15. Удаление труб" << "\n"
-		<< "16. Удаление КС" << "\n"
-		<< "0. Выход" << "\n"
-		<< "-------------------" << endl;
-}
-
-void Print_second_menu(string clause1, string clause2)
-{
-	cout << "-------------------\n"
-		<< "0. Назад" << "\n"
-		<< "1. " << clause1 << "\n"
-		<< "2. " << clause2 << "\n"
-		<< "-------------------" << endl;
-}
-
-template<typename T>
-bool del(unordered_map<int, T>& map, int id) {
-	return map.erase(id);
-}
 int main()
 {
-	setlocale(LC_ALL, "Russian");
-	unordered_map <int, Pipe> Pipes;
-	unordered_map <int, CS> CSs;
-	GTS GTS;
-	vector <int> EditedPipes;
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
+	GTS gtn = GTS();
+	int edgeCount = 0;
+
 	while (true)
 	{
-		PrintMenu();
-		int i = CheckValue("Выберите от 0 до 16: ", 0, 16);
-		cout << '\n';
-		switch (i)
+		PrintTitle("МЕНЮ");
+		cout << "1 - Добавить трубу\n"
+			<< "2 - Добавить КС\n"
+			<< "3 - Просмотр всех объектов\n"
+			<< "4 - Редактировать трубу\n"
+			<< "5 - Редактировать КС\n"
+			<< "6 - Удалить трубу\n"
+			<< "7 - Удалить КС\n"
+			<< "8 - Поиск труб\n"
+			<< "9 - Поиск КС\n"
+			<< "10 - Сохранить\n"
+			<< "11 - Загрузить\n"
+			<< "12 - Установить связь\n"
+			<< "13 - Удалить связь\n"
+			<< "14 - Вывести газотранспортную сеть\n"
+			<< "15 - Выполнить топологическую сортировку\n"
+			<< "16 - Найти кратчайшие пути\n"
+			<< "0 и пр. - Выход\n";
+
+		int inputMenu;
+		CheckValue(inputMenu, "Что Вы хотите сделать: ");
+
+		switch (inputMenu)
 		{
 		case 1:
 		{
-			while (true)
-			{
-				Print_second_menu("Труба", "КС");
-				int i1 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i1 == 1)
-				{
-					Pipe pipe;
-					cin >> pipe;
-					Pipes.emplace(pipe.getid(), pipe);
-				}
-				else if (i1 == 2)
-				{
-					CS cs;
-					cin >> cs;
-					CSs.emplace(cs.getid(), cs);
-				}
-				else if (i1 == 0)
-				{
-					break;
-				}
-				else
-				{
-					cout << "Ошибка: выберите от 0 до 2" << endl;
-				}
-			}
+			PrintTitle("ДОБАВИТЬ ТРУБУ");
+			gtn.AddPipe();
 			break;
 		}
 		case 2:
 		{
-			if (Pipes.size() != 0) {
-				for (auto& p : Pipes)
-				{
-					cout << p.second << endl;
-				}
-			}
-			else {
-				cout << "Вы еще не создавали трубы" << endl;
-			}
-			if (CSs.size() != 0) {
-				for (auto& cs : CSs) {
-					cout << cs.second << endl;
-				}
-			}
-			else {
-				cout << "Вы еще не создавали КС" << endl;
-			}
+			PrintTitle("ДОБАВИТЬ КС");
+			gtn.AddCs();
 			break;
 		}
-		case 3: {
-			while (true) {
-				Print_second_menu("Труба", "КС");
-				int i2 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i2 == 1) {
-					int ID = CheckValue("Введите ID: ", 1u, Pipes.size());
-					if (Pipes.size() != 0) {
-						if (Pipes.count(ID))
-							Pipes[ID].Pipe_status_change();
-						else cout << " Такого ID не существует " << endl;
-					}
-					else {
-						cout << "Вы еще не создавали трубы" << endl;
-					}
-				}
-				else if (i2 == 2) {
-					int ID = CheckValue("Введите ID:", 1u, CSs.size());
-					if (CSs.size() != 0) {
-						CSs[ID].edit_CS();
-					}
-					else {
-						cout << "Вы еще не создавали КС" << endl;
-					}
-				}
-				else if (i2 == 0) {
-					cout << '\n';
-					break;
-				}
-				else {
-					cout << "Ошибка, выберите от 0 до 2" << endl;
-				}
-			}
+		case 3:
+		{
+			PrintTitle("ПРОСМОТР ВСЕХ ОБЪЕКТОВ");
+			cout << gtn;
 			break;
 		}
-		case 4: {
-			while (true) {
-				Print_second_menu("Труба", "КС");
-				int i3 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i3 == 1) {
-					if (Pipes.size() != 0) {
-						DeletePipeCS(Pipes);
-					}
-					else {
-						cout << "Вы еще не создавали трубы" << endl;
-					}
-				}
-				else if (i3 == 2) {
-					if (CSs.size() != 0) {
-						DeletePipeCS(CSs);
-					}
-					else {
-						cout << "Вы еще не создавали КС" << endl;
-					}
-				}
-				else if (i3 == 0) {
-					cout << '\n';
-					break;
-				}
-				else {
-					cout << "Ошибка: выберите от 0 до 2" << endl;
-				}
-			}
+		case 4:
+		{
+			PrintTitle("РЕДАКТИРОВАТЬ ТРУБУ");
+			if (gtn.HasPipe())
+				gtn.EditPipe();
+			else
+				cout << "У Вас нет труб для редактирования.\n";
 			break;
 		}
-		case 5: {
-			while (true) {
-				Print_second_menu("Поиск по ID", "Поиск по статусу в ремонте ");
-				int i4 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i4 == 1) {
-					unsigned int id_to_find;
-					id_to_find = CheckValue("Введите ID: ", 0u, 10000u);
-					for (int i : FindObjectsByFilter(Pipes, CheckByID, id_to_find)) {
-						cout << Pipes[i] << endl;
-						EditedPipes.push_back(i);
-					}
-				}
-				else if (i4 == 2) {
-					bool is_broken_status_to_find;
-					is_broken_status_to_find = CheckValue("В ремонте? [да-1/нет-0]: ", false, true);
-					for (int i : FindObjectsByFilter(Pipes, CheckByBroken, is_broken_status_to_find)) {
-						cout << Pipes[i] << endl;
-						EditedPipes.push_back(i);
-					}
-				}
-				else if (i4 == 0) {
-					break;
-				}
-				else {
-					cout << "Ошибка: выберите от 0 до 2" << endl;
-				}
-			}
+		case 5:
+		{
+			PrintTitle("РЕДАКТИРОВАТЬ КС");
+			if (gtn.HasCs())
+				gtn.EditCs();
+			else
+				cout << "У Вас нет КС для редактирования.\n";
 			break;
 		}
 		case 6:
 		{
-			while (true)
-			{
-				Print_second_menu("Поиск по имени", "Поиск по проценту незадействованных цехов");
-				int i5 = CheckValue("Выберите от 0 до 2: ", 0, 2);
-				if (i5 == 1) {
-					string name_to_find;
-					cout << "Введите имя КС: ";
-					cin.get();
-					getline(cin, name_to_find);
-					for (int i : FindObjectsByFilter(CSs, CheckByName, name_to_find)) {
-						cout << CSs[i] << endl;
-					}
-				}
-				else if (i5 == 2) {
-					double percentage_to_find;
-					percentage_to_find = CheckValue("Введите значение в процентах (0-100%): ", 0.0, 100.0);
-					for (int i : FindObjectsByFilter(CSs, CheckByPercentOfWorkshops, percentage_to_find)) {
-						cout << CSs[i] << endl;
-					}
-				}
-				else if (i5 == 0) {
-					break;
-				}
-				else {
-					cout << "Ошибка: выберите от 0 до 2 " << endl;
-				}
-			}
+			PrintTitle("УДАЛИТЬ ТРУБУ");
+			if (gtn.HasPipe())
+				gtn.DeletePipe();
+			else
+				cout << "У Вас нет трубы для удаления.\n";
 			break;
 		}
-		case 7: {
-			if (Pipes.size() != 0) {
-				EditingPipes(Pipes, EditedPipes);
-			}
-			else {
-				cout << "Вы еще не создавали трубы" << endl;
-			}
+		case 7:
+		{
+			PrintTitle("УДАЛИТЬ КС");
+			if (gtn.HasCs())
+				gtn.DeleteCs();
+			else
+				cout << "У Вас нет КС для удаления.\n";
 			break;
 		}
-		case 8: {
-			ofstream fout;
-			string filename;
-			cout << "Введите название файла: ";
-			cin.ignore();
-			getline(cin, filename);
-			fout.open(filename, ios::out);
-			if (fout.is_open())
-			{
-				fout << Pipes.size() << endl;
-				fout << CSs.size() << endl;
-				for (auto p : Pipes)
-					fout << p.second;
-				for (auto cs : CSs)
-					fout << cs.second;
-				fout.close();
-			}
-			else cout << "Файл не открывается" << endl;
+		case 8:
+		{
+			PrintTitle("ПОИСК ТРУБ");
+			if (gtn.HasPipe())
+				gtn.SearchPipes();
+			else
+				cout << "У Вас нет трубы для поиска.\n";
 			break;
 		}
-		case 9: {
-			ifstream fin;
-			string filename;
-			cout << "Введите название файла: ";
-			cin.ignore();
-			getline(cin, filename);
-			fin.open(filename, ios::in);
-			if (fin.is_open()) {
-				int number_of_pipes;
-				int number_of_CSs;
-				fin >> number_of_pipes;
-				fin >> number_of_CSs;
-				while (number_of_pipes--) {
-					Pipe p;
-					fin >> p;
-					Pipes.emplace(p.getid(), p);
-				}
-				while (number_of_CSs--) {
-					CS c;
-					fin >> c;
-					CSs.emplace(c.getid(), c);
-				}
-				fin.close();
-			}
-			else cout << "Файл не открывается" << endl;
+		case 9:
+		{
+			PrintTitle("ПОИСК КС");
+			if (gtn.HasCs())
+				gtn.SearchCss();
+			else
+				cout << "У Вас нет КС для поиска.\n";
 			break;
 		}
 		case 10:
 		{
-			system("cls");
+			PrintTitle("СОХРАНИТЬ");
+			if (gtn.HasPipe() == false && gtn.HasCs() == false)
+			{
+				cout << "Внимание! У Вас ни одной трубы и КС. Вы действительно хотите сохранить данные?\n";
+				int input;
+				CheckValue(input, "(1 - да, 0 и пр. - нет): ");
+				if (input != 1)
+				{
+					cout << "Отмена сохранения...\n";
+					break;
+				}
+			}
+			string filename;
+			cout << "Введите имя файла сохранения (.txt): ";
+			cin >> filename;
+			ofstream fout;
+			fout.open(filename + ".txt", ios::out);
+			if (fout.is_open())
+			{
+				gtn.SaveToFile(fout);
+				fout.close();
+				cout << "Файл успешно сохранён!\n";
+			}
+			else
+			{
+				cout << "Ошибка сохранения файла!\n";
+			}
 			break;
 		}
 		case 11:
 		{
-			GTS.add_cs(CSs, CheckValue("Введите ID КС: ", 0, CS::getMaxID()));
+			PrintTitle("ЗАГРУЗИТЬ");
+			string filename;
+			cout << "Введите имя файла загрузки (.txt): ";
+			cin >> filename;
+			ifstream fin;
+			fin.open(filename + ".txt", ios::in);
+			if (fin.is_open())
+			{
+				gtn = GTS(fin);
+				fin.close();
+				cout << "Файл успешно загружен!\n";
+			}
+			else
+			{
+				cout << "Ошибка сохранения файла!\n";
+			}
 			break;
 		}
 		case 12:
 		{
-			GTS.add_pipe(Pipes, CheckValue("Введите ID трубы:", 0, Pipe::getMaxID()));
+			PrintTitle("УСТАНОВИТЬ СВЯЗЬ");
+			if (gtn.HasPipe() && gtn.HasCs(2))
+				gtn.ConnectPipe();
+			else
+				cout << "У Вас нет труб и КС для связи.\n";
 			break;
 		}
 		case 13:
 		{
-			GTS.connect_vertices(CSs, Pipes);
+			PrintTitle("УДАЛИТЬ СВЯЗЬ");
+			if (gtn.HasPipe() && gtn.HasCs(2))
+				gtn.ConnectPipe();
+			else
+				cout << "У Вас нет связей\n";
 			break;
 		}
 		case 14:
 		{
-			GTS.create_adjmatr(CSs, Pipes);
-			GTS.sort();
+			PrintTitle("ГАЗОТРАНСПОРТНАЯ СЕТЬ");
+			gtn.ShowNetwork();
 			break;
 		}
 		case 15:
 		{
-			while (1) {				
-				int id = CheckValue("Введите ID ", 0, Pipe::getMaxID());
-				if (del(Pipes, id)) {
-					GTS.delete_vertices(id);
-					cout << "Труба удалена" << endl;
-				}
-				else
-					cout << "Deletion not executed" << endl;
-				if (CheckValue("Продолжить удаление? 1-Да\0-Нет", 0, 1) == 0)
-					break;
-			}
+			PrintTitle("ТОПОЛОГИЧЕСКАЯ СОРТИРОВКА");
+			gtn.TopologicalSort();
 			break;
 		}
 		case 16:
 		{
-			while (1) {
-				int id = CheckValue("ID кс для удаления", 0, CS::getMaxID());
-				if (del(CSs, id)) {
-					GTS.delete_edge(id, Pipes);
-					cout << "КС успешно удалена" << endl;
-				}
-				else
-					cout << "КС с таким ID не найлена" << endl;
-				if (CheckValue("Продолжить удаление? 1-Да/0-Нет", 0, 1) == 0)
-					break;
-			}
+			PrintTitle("НАЙТИ КРАТЧАЙШИЕ ПУТИ");
+			gtn.FindShortestPath();
 			break;
-		}
-		case 0:
-		{
-			return 0;
 		}
 		default:
 		{
-			cout << "Ошибка: введите значение 0 до 10" << endl;
+			return 0;
 		}
-		
 		}
 	}
-		return 0;
 }
+
+
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
 // Отладка программы: F5 или меню "Отладка" > "Запустить отладку"

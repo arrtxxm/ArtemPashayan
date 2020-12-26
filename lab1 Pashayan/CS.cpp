@@ -1,107 +1,100 @@
-#pragma once
-#include <iostream>
 #include "CS.h"
-#include "utils.h"
 
-using namespace std;
+int CS::csMaxId = 0;
+std::string Name;
+int ShopsCount;
+int WorkingShopsCount;
+float Efficiency;
 
-int CS::MaxID = 0;
 
-string CS::getname() const
+CS::CS(std::ifstream& fin)
 {
-	return name;
+	fin.ignore();
+	std::getline(fin, Name);
+	fin >> ShopsCount
+		>> WorkingShopsCount
+		>> Efficiency;
 }
 
-int CS::getMaxID()
+std::string CS::GetName() const
 {
-	return MaxID;
+	return Name;
 }
 
-int CS::getid() const
+float CS::GetPercentUnusedShops() const
 {
-	return id;
+	return (1 - (WorkingShopsCount * 1.0f / ShopsCount)) * 100;
 }
 
-int CS::getworkshops() const 
+void CS::RecountShopsCount()
 {
-	return workshops;
-}
-
-int CS::getrunning_workshops() const
-{
-	return running_workshops;
-}
-
-double CS::getefficiency() const
-{
-	return efficiency;
-}
-
-void CS::edit_CS() {
-	running_workshops = CheckValue("Введите количество цехов в работе: ", 0, workshops);
-}
-
-void CS::stop_CS()
-{
-	if (running_workshops > 0) {
-		running_workshops--;
-	}
-	else {
-		cout << "Нет цехов в работе" << endl;
-	}	
-}
-
-void CS::run_CS()
-{
-	if (running_workshops < workshops) {
-		running_workshops++;
-	}
-	else {
-		cout << "Все цеха в работе" << endl;
+	std::cout << "Сейчас в КС есть " << ShopsCount << " цехов.\n";
+	std::cout << "1 - Увеличить количество цехов\n"
+		<< "2 - Уменьшить количество цехов\n"
+		<< "0 и пр. - Отмена\n";
+	int input;
+	CheckValue(input, "Введите: ");
+	switch (input)
+	{
+	case 1:
+		ShopsCount++;
+		std::cout << "Количество цехов успешно увеличено до " << ShopsCount << "\n";
+		break;
+	case 2:
+		ShopsCount--;
+		if (WorkingShopsCount > ShopsCount)
+			WorkingShopsCount = ShopsCount;
+		std::cout << "Количество цехов успешно уменьшено до " << ShopsCount << "\n";
+	default:
+		std::cout << "Вы вышли из режима редактирования.";
+		break;
 	}
 }
-	
 
-CS::CS() {
-	id = ++MaxID;
-	name = "Unknown";
-	workshops = 0;
-	running_workshops = 0;
-	efficiency = 0.0;
+void CS::RecountWorkingShopsCount()
+{
+	std::cout << "Сейчас в КС работают " << WorkingShopsCount << "/" << ShopsCount << " цехов\n";
+	int workingShopsCount;
+	CheckValue(workingShopsCount, "Введите новое количество работающих цехов: ");
+	while (workingShopsCount > ShopsCount)
+	{
+		std::cout << "Ошибка! Количество работающих цехов не может быть больше общего количества цехов\n";
+		CheckValue(workingShopsCount, "Введите новое количество работающих цехов: ");
+	}
+	WorkingShopsCount = workingShopsCount;
 }
 
-
-istream& operator >> (istream& in, CS& cs)
+void CS::SaveToFile(std::ofstream& fout)
 {
-	cout << "Введите имя КС: " << endl;
-	cin.get();
-	getline(cin, cs.name);
-	cs.workshops = CheckValue("Сколько заводов всего: ", 0, 100);
-	cs.running_workshops = CheckValue("Сколько заводов в работе: ", 0, cs.workshops);
-	cs.efficiency = CheckValue("Эффективность КС: ", 0.0, 1.0);
-	return in;
+	fout << Name << '\n'
+		<< ShopsCount << '\n'
+		<< WorkingShopsCount << '\n'
+		<< Efficiency << '\n';
 }
 
-ostream& operator << (ostream& out, const CS& cs)
+std::ostream& operator << (std::ostream& out, const CS& cs)
 {
-	out << "\nИнформация о КС " << cs.id << "\n"
-		<< "Имя КС: " << cs.name << "\n"
-		<< "Количество заводов: " << cs.workshops << "\n"
-		<< "Количество заводов в работе: " << cs.running_workshops << "\n"
-		<< "Эффективность КС: " << cs.efficiency << endl;
+	std::cout << "    Имя: " << cs.Name << "\n"
+		<< "    Работает " << cs.WorkingShopsCount << "/" << cs.ShopsCount << " цехов" "\n"
+		<< "    Эффективность: " << cs.Efficiency << "\n";
 	return out;
 }
 
-ifstream& operator>>(ifstream& fin, CS& cs)
+std::istream& operator>>(std::istream& in, CS& cs)
 {
-	fin >> cs.id >> cs.name >> cs.workshops
-		>> cs.running_workshops >> cs.efficiency;
-	return fin;
+	std::cout << "Введите имя компрессорной станции: ";
+	std::cin.ignore();
+	std::getline(std::cin, cs.Name);
+	CheckValue(cs.ShopsCount, "Введите общее кол-во цехов: ");
+	CheckValue(cs.WorkingShopsCount, "Введите кол-во работающих цехов: ");
+	while (cs.WorkingShopsCount > cs.ShopsCount) {
+		std::cout << "Ошибка! Кол-во работающих цехов не может быть больше общего кол-ва цехов\n";
+		CheckValue(cs.WorkingShopsCount, "Пожалуйста, введите корректное кол-во работающих цехов: ");
+	}
+	CheckValue(cs.Efficiency, "Введите эффетивность компрессорной станции: ");
+	return in;
 }
 
-ofstream& operator<<(ofstream& fout, const CS& cs)
+CS::CS()
 {
-	fout << cs.id << endl << cs.name << endl << cs.workshops
-		<< endl << cs.running_workshops << endl << cs.efficiency << endl;
-	return fout;
 }

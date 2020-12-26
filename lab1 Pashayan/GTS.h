@@ -1,47 +1,41 @@
 #pragma once
+#include <iostream>
+#include <vector>
+#include <stack>
 #include "Pipe.h"
 #include "CS.h"
-#include <unordered_set>
 #include <unordered_map>
-#include <vector>
-
-
+#include "utils.h"
+#include <set>
 using namespace std;
 
 class GTS
 {
-	unordered_set<int> Edges; 
-	unordered_set<int> Vertices; 
+    unordered_map<int, Pipe> pGroup;
+    unordered_map<int, CS> csGroup;
 
-	unordered_map<int, int> IdIndexCS;
-	unordered_map<int, int> IdIndexPipe;
-
-	vector<vector<int>> AdjMatr;
-
-	bool Is_Changed;
+    vector<vector<int>> GetEdgesAndVertexes(unordered_map<int, int>& indexVertexes, int& n);
 
 public:
-	int get_csindex(int) const;	
-	
-	int GetCsId(int) const;
-
-	void add_cs(const unordered_map<int, CS>&, int);
-
-	void add_pipe(const unordered_map<int, Pipe>&, int);
-
-	void connect_vertices(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
-
-	void create_adjmatr(unordered_map<int, CS>&, unordered_map<int, Pipe>&);
-
-	void delete_edge(int, unordered_map<int, Pipe>&);
-
-	void delete_vertices(int);
-
-	void topological_sort(int, vector<int>&, bool&, vector<int>&);
-
-	void sort();
-
-	void UpdateIndex();
-
-
+    GTS();
+    GTS(ifstream& fin);
+    friend ostream& operator << (ostream& out, const GTS& gtn);
+    void SaveToFile(ofstream& fout);
+    void AddPipe();
+    void AddCs();
+    bool HasPipe() const;
+    bool HasCs(int count = 1) const;
+    void EditPipe();
+    void EditCs();
+    void DeletePipe();
+    void DeleteCs();
+    void SearchPipes();
+    void SearchCss();
+    void ConnectPipe();
+    void DisonnectPipe();
+    bool CanBeUsed(const Pipe& p) const;
+    void ShowNetwork();
+    void TopologicalSort();
+    void FindMaxFlow();
+    void FindShortestPath();
 };

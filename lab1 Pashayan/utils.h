@@ -1,18 +1,13 @@
 #pragma once
 #include <iostream>
-#include <string>
-
-using namespace std;
 
 template <typename T>
-T CheckValue(string text, T min, T max)
+void CheckValue(T& input, std::string inputText)
 {
-	T value;
-	cout << text;
-	while (!(std::cin >> value) || value < min || value > max) {
-		cin.clear();
-		cin.ignore(10000, '\n');
-		cout << text;
+	std::cout << inputText;
+	while ((std::cin >> input).fail() || input < 0) {
+		std::cout << "Неверный ввод :( Пожалуйста, попробуйте снова:\n";
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
 	}
-	return value;
 }

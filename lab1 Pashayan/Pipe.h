@@ -1,47 +1,26 @@
 #pragma once
 #include <iostream>
-#include <string>
+#include "utils.h"
 #include <fstream>
 
-using namespace std;
-
 class Pipe
-{	int id;
-	int diameter;
-	int start;
-	int end;
+{
+	float Length;
+	float Diameter;
+	bool IsRepairing;
 
-	static int MaxID;
-
-	bool broken;
-	bool used;
-
-	//double weight;
-	double length;
-	
-public:	
-	int getid() const;
-	//int getweight() const;
-	int getlength() const;
-	int getdiameter() const;
-	int getstart() const;
-	int getend() const;
-
-	static int getMaxID();
-
-	bool getbroken() const;
-
-	friend istream& operator >> (istream& in, Pipe& p);
-	friend ostream& operator << (ostream& out, const Pipe& p);
-	friend ifstream& operator >> (ifstream& in, Pipe& p);
-	friend ofstream& operator << (ofstream& out, const Pipe& p);
-
-	void setstart(int);
-	void setend(int);
-
-	void used_status_change();
-	void Pipe_status_change();
-
+public:
+	static int pMaxId;
+	int outCsId;
+	int inCsId;
+	friend std::ostream& operator << (std::ostream& out, const Pipe& p);
+	friend std::istream& operator >> (std::istream& in, Pipe& p);
 	Pipe();
-
+	Pipe(std::ifstream& fin);
+	int GetProductivity() const;
+	bool GetRepairing() const;
+	float GetLength() const;
+	void Edit();
+	void SaveToFile(std::ofstream& fout);
+	void Repair();
 };

@@ -1,116 +1,104 @@
-#pragma once
-#include <iostream>
-#include <string>
-#include <fstream>
 #include "Pipe.h"
-#include "utils.h"
 
-using namespace std;
+int Pipe::pMaxId = 0;
+float Length;
+float Diameter;
+bool IsRepairing;
+int outCsId;
+int inCsId;
 
-int Pipe::MaxID = 0;
 
 
-
-int Pipe::getid() const
+Pipe::Pipe(std::ifstream& fin)
 {
-	return id;
+	fin >> Length
+		>> Diameter
+		>> IsRepairing
+		>> outCsId
+		>> inCsId;
 }
 
-//int Pipe::getweight() const
-//{
-//	return weight;
-//}
-
-int Pipe::getlength() const
+int Pipe::GetProductivity() const
 {
-	return length;
+	return round(sqrt(pow(Diameter, 5) / Length) / 200);
 }
 
-int Pipe::getdiameter() const
+float Pipe::GetLength() const
 {
-	return diameter;
+	return Length;
 }
 
-int Pipe::getstart() const
+bool Pipe::GetRepairing() const
 {
-	return start;
+	return IsRepairing;
 }
 
-int Pipe::getend() const
+void Pipe::Edit()
 {
-	return end;
+	if (IsRepairing)
+		std::cout << "\nО, нет! Труба сломана!\n";
+	else
+		std::cout << "\nТруба не нуждается в ремонте.\n";
+	std::cout << "Что Вы хотите сделать с трубой?\n"
+		<< "1 - Починить/Сломать\n"
+		<< "0 и пр. - Отмена\n";
+	int input;
+	CheckValue(input, "Введите: ");
+	switch (input)
+	{
+	case 1:
+	{
+		IsRepairing = !IsRepairing;
+		if (IsRepairing)
+			std::cout << "Труба успешно сломана и находится в ремонте!\n";
+		else
+			std::cout << "Ремонт трубы успешно завершён!\n";
+		break;
+	}
+	default:
+	{
+		std::cout << "Вы вышли из режима редактирования.\n";
+		break;
+	}
+	}
 }
 
-int Pipe::getMaxID()
+void Pipe::SaveToFile(std::ofstream& fout)
 {
-	return MaxID;
+	fout << Length << '\n'
+		<< Diameter << '\n'
+		<< IsRepairing << '\n'
+		<< outCsId << '\n'
+		<< inCsId << '\n';
 }
 
-bool Pipe::getbroken() const
+void Pipe::Repair()
 {
-	return broken;
+	IsRepairing = true;
 }
 
-void Pipe::setstart(int new_start)
+std::ostream& operator << (std::ostream& out, const Pipe& p)
 {
-	start = new_start;
-}
-
-void Pipe::setend(int new_end)
-{
-	end = new_end;
-}
-
-
-
-void Pipe::used_status_change()
-{
-	used = !used;
-}
-
-void Pipe::Pipe_status_change()
-{
-	broken = !broken;
-}
-
-istream& operator >> (istream& in, Pipe& p)
-{
-	p.length = CheckValue("Введите длину трубы: ", 0.0, 1000.0);
-	p.diameter = CheckValue("Введите диаметр трубы: ", 0, 2500);
-	p.broken = false;
-	return in;
-}
-
-
-ostream& operator << (ostream& out, const Pipe& p)
-{
-	out << "\nИнформация о трубе " << p.id << "\n"
-		<< "Длина трубы: " << p.length << "\n"
-		<< "Диаметр трубы: " << p.diameter << "\n"
-		<< "Статус трубы: " << p.broken
-		<< endl;
+	out << "    Длина: " << p.Length << " м" << '\n'
+		<< "    Диаметр: " << p.Diameter << " см" << '\n'
+		<< "    Производительность: " << p.GetProductivity() << " млн м3/сут" << '\n';
+	if (p.IsRepairing)
+		out << "    Находится в ремонте" << '\n';
+	else
+		out << "    Не нуждается в ремонте" << '\n';
 	return out;
 }
 
-ifstream& operator>>(ifstream& fin, Pipe& p)
+std::istream& operator >> (std::istream& in, Pipe& p)
 {
-	fin >> p.id >> p.length >> p.diameter >> p.broken;
-	return fin;
+	CheckValue(p.Length, "Введите длину трубы (в метрах): ");
+	CheckValue(p.Diameter, "Введите диаметр трубы (в сантиметрах): ");
+	p.IsRepairing = true;
+	p.outCsId = -1;
+	p.inCsId = -1;
+	return in;
 }
 
-ofstream& operator<<(ofstream& fout, const Pipe& p)
+Pipe::Pipe()
 {
-	fout << p.id << endl << p.length << endl
-		<< p.diameter << endl << p.broken << endl;
-	return fout;
-}
-
-Pipe::Pipe() {
-	id = MaxID++;
-	length = 0.0;
-	diameter = 0;
-	broken = false;
-	used = false;
-	start = -1;
-	end = -1;
 }
