@@ -2,6 +2,7 @@
 #include <iostream>
 #include "utils.h"
 #include <fstream>
+#include <cmath>
 
 class Pipe
 {

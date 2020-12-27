@@ -1,5 +1,6 @@
 #include "Pipe.h"
 
+
 int Pipe::pMaxId = 0;
 float Length;
 float Diameter;
@@ -20,7 +21,7 @@ Pipe::Pipe(std::ifstream& fin)
 
 int Pipe::GetProductivity() const
 {
-	return round(sqrt(pow(Diameter, 5) / Length) / 200);
+	return sqrt(pow(Diameter, 5 / Length)) * 10;
 }
 
 float Pipe::GetLength() const
