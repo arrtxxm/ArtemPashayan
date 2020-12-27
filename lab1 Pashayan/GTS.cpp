@@ -561,3 +561,81 @@ void GTS::ShowNetwork()
 		if (CanBeUsed(p.second))
 			cout << "КС " << p.second.outCsId << " -- Труба " << p.first << " -> КС " << p.second.inCsId << '\n';
 }
+
+void GTS::FindMaxFlow()
+{
+	set<int> vertexes;
+	for (const pair<int, Pipe>& p : pGroup)
+		if (CanBeUsed(p.second))
+		{
+			vertexes.insert(p.second.outCsId);
+			vertexes.insert(p.second.inCsId);
+		}
+	int n = vertexes.size();
+	unordered_map<int, int> invertIndexVertexes;
+	unordered_map<int, int> indexVertexes;
+	int i = 0;
+	for (const int& vertex : vertexes)
+	{
+		indexVertexes.insert(make_pair(i, vertex));
+		invertIndexVertexes.insert(make_pair(vertex, i++));
+	}
+	vector<vector<int>> graph;
+	graph.resize(n);
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			graph[i].push_back(0);
+	for (const pair<int, Pipe>& p : pGroup)
+		if (CanBeUsed(p.second))
+			graph[invertIndexVertexes[p.second.outCsId]][invertIndexVertexes[p.second.inCsId]] = p.second.GetProductivity();
+
+	int start;
+	CheckValue(start, "Введите ID КС, из которой будет идти поток (0 - выйти): ");
+	if (invertIndexVertexes.find(start) != invertIndexVertexes.end())
+		start = invertIndexVertexes[start];
+	else
+	{
+		cout << "Ошибка! Такой КС нет в сети((";
+		return;
+	}
+	int end;
+	CheckValue(end, "Введите ID КС, в которую придёт поток (0 - выйти): ");
+	if (invertIndexVertexes.find(end) != invertIndexVertexes.end())
+		end = invertIndexVertexes[end];
+	else
+	{
+		cout << "Ошибка! Такой КС нет в сети((";
+		return;
+	}
+
+	int head, tail;
+	vector<vector<int>> flow;
+	vector<int> color, pred, q;
+
+	int maxflow = 0;
+	flow.resize(n);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			flow[i].push_back(0);
+		color.push_back(-1);
+		pred.push_back(-1);
+		q.push_back(0);
+	}
+	q.push_back(0); q.push_back(0);
+	while (bfs(start, end, color, pred, q, graph, flow, n, head, tail) == 0)
+	{
+		int delta = 10000;
+		for (int u = end; pred[u] >= 0; u = pred[u])
+		{
+			delta = min(delta, (graph[pred[u]][u] - flow[pred[u]][u]));
+		}
+		for (int u = end; pred[u] >= 0; u = pred[u])
+		{
+			flow[pred[u]][u] += delta;
+			flow[u][pred[u]] -= delta;
+		}
+		maxflow += delta;
+	}
+	cout << "Максимальный поток: " << maxflow << endl;
+}
